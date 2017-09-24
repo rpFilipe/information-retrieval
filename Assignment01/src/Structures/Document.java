@@ -10,7 +10,7 @@ package Structures;
  * @author rpfilipe
  */
 public class Document {
-    
+
     private int docId;
     private String content;
 
@@ -18,8 +18,6 @@ public class Document {
         this.docId = docId;
         this.content = content;
     }
-    
-    
 
     public int getDocId() {
         return docId;
@@ -33,6 +31,5 @@ public class Document {
     public String toString() {
         return "Document{" + "docId=" + docId + ", content=" + content + '}';
     }
-    
-    
+
 }

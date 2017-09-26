@@ -33,8 +33,10 @@ public class Assignment01 {
             System.out.println("Loading stopwords list from " + cLocation);
             Tokenizer tk = new Tokenizer(cLocation);
             System.out.println("Document Processor started...");
-            // apagar
+            // just for debug and test. to delete after
             //System.out.println(tk.contentProcessor("It is a nice day!").toString());
+            //Stemmer stemmer = new Stemmer("english");
+            //System.out.println(""+stemmer.getStemmer("birds"));
      
             System.out.println("Document Processor finished...");
 

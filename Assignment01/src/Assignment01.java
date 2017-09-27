@@ -17,27 +17,39 @@ import org.xml.sax.SAXException;
 public class Assignment01 {
 
     public static void main(String[] args) {
+        
+        if(args.length !=3){
+            usage();
+            return;
+        }
+        
         try {
-            String cLocation = "cranfield/";
+            String cLocation = args[0];
             System.out.println("Reading the corpus from " + cLocation);
             CorpusReader cr = new CorpusReader(cLocation);
             //cr.printCorpusDocuments();
             while (cr.hasNext()) {
-                //System.out.println(cr.next());
                 cr.next();
+
             }
 
             System.out.println("parsing finished");
 
-            cLocation = "stopwords/stopwords.txt";
+            cLocation = args[1];
             System.out.println("Loading stopwords list from " + cLocation);
-            Tokenizer tk = new Tokenizer(cLocation);
+            Tokenizer stk = new SimpleTokenizer();
+            Tokenizer ctk = new ComplexTokenizer();
+      
             System.out.println("Document Processor started...");
-            // just for debug and test. to delete after
-            //System.out.println(tk.contentProcessor("It is a nice day!").toString());
-            //Stemmer stemmer = new Stemmer("english");
-            //System.out.println(""+stemmer.getStemmer("birds"));
-     
+            
+            // falta associar aos corpus reader
+            try {
+                Stopwords sw = new Stopwords(cLocation);
+            } catch (IOException ex) {
+                Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Stemmer stemmer = new Stemmer("args[2]"); 
+
             System.out.println("Document Processor finished...");
 
         } catch (ParserConfigurationException ex) {
@@ -45,5 +57,11 @@ public class Assignment01 {
         } catch (SAXException ex) {
             Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static void usage()
+    {
+        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> ");
+        System.err.println("Example: <cranfield/> <stopwords/stopwords.txt> <english> ");
     }
 }

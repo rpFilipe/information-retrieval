@@ -1,9 +1,9 @@
 
 import Structures.Document;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +27,7 @@ public class CorpusReader implements Iterator<Object>{
     private int currentIndex;
     private int corpusSize;
     private XMLParser parser;
+    
     
     public CorpusReader(String cLocation) throws ParserConfigurationException, SAXException {
         this.cLocation = cLocation;
@@ -54,8 +55,6 @@ public class CorpusReader implements Iterator<Object>{
     public Object next() {
         // Parsing of file
         return parseDocument(corpus[currentIndex++]);
-        
-        
     }
     
     private Document parseDocument(File doc) {
@@ -67,6 +66,10 @@ public class CorpusReader implements Iterator<Object>{
             Logger.getLogger(CorpusReader.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+    
+    public int size(){
+        return corpusSize;
     }
     
 }

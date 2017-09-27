@@ -27,7 +27,8 @@ public class Indexer {
                     map.put(keyTerm, pListLoad);
                 } else {
                     if (pListLoad.add(new Posting(p.getDocId()))) {
-                        Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.getDocId() > rhs.getDocId() ? -1 : (lhs.getDocId() < rhs.getDocId()) ? 1 : 0 );
+                        //Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.getDocId() > rhs.getDocId() ? -1 : (lhs.getDocId() < rhs.getDocId()) ? 1 : 0 );
+                        Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.compareTo(rhs) );
                         map.put(keyTerm, pListLoad);
                     } else {
                         System.err.println("Error!");

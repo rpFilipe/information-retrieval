@@ -35,17 +35,15 @@ public class XMLParser {
             private String content = "";
 
             @Override
-            public void characters(char ch[], int start, int length) {
+            public void characters(char ch[], int start, int length) { 
                 if (isDocId) {
                     docId = Integer.parseInt(new String(ch, start, length).trim());
                     isDocId = false;
                 } else if (isToIgnore) {
                     isToIgnore = false;
                 } else {
-                    content = content + " " + new String(ch, start, length);
+                    content = content + " " + new String(ch, start, length).trim().replaceAll(" +", " ");
                 }
-
-                content = content.trim().replaceAll(" +", " ");
 
             }
 

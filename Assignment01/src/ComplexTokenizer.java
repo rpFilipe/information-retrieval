@@ -23,10 +23,6 @@ public class ComplexTokenizer extends Tokenizer{
         // tratar a string quanto aos caracteres especiais
 
         List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
-        for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
-            String s = iterator.next();
-            
-        }
 
         return list;
     }

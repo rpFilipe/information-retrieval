@@ -54,7 +54,7 @@ public class Indexer {
             List<Posting> tmp = entry.getValue();
             print = print + "Key: " + entry.getKey();
             for (Posting p : tmp) {
-                print = print + " DocId: " + p.getDocId() + " frequency: " + p.getFrequency() + " ";
+                print = print + " DocId: " + p.getDocId() + " frequency: " + p.getFrequency() + "; ";
             }
         }
 

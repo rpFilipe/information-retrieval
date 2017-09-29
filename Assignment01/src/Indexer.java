@@ -61,9 +61,9 @@ public class Indexer {
         String print = "";
         for (Map.Entry<String, List<Posting>> entry : map.entrySet()) {
             List<Posting> tmp = entry.getValue();
-            print = print + "Key: " + entry.getKey();
+            print = print + entry.getKey()+",";
             for (Posting p : tmp) {
-                print = print + "\t\tDocId: " + p.getDocId() + "\tfrequency: " + p.getFrequency() + "\n";
+                print = print + p.getDocId() + ":" + p.getFrequency() + "\n";
             }
         }
 

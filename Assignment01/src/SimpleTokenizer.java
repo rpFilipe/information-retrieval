@@ -23,13 +23,14 @@ public class SimpleTokenizer extends Tokenizer {
     
     @Override
     public List contentProcessor(String sInput) {
-        sInput = sInput.toLowerCase().replaceAll("/[^A-Za-z0-9]/", "");
+       sInput = sInput.toLowerCase().replaceAll("[^A-Za-z0-9]", " ");
 
         List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
-        list.stream().filter((s) -> (s.length() > 3)).forEachOrdered((s) -> {
-            list.remove(s);
+        List<String> tmp = new ArrayList<>();
+        list.stream().filter((s) -> (s.length() < 3)).forEachOrdered((s) -> {
+            tmp.add(s);
         });
-
-        return list;
+        
+        list.removeAll(tmp);
     }
 }

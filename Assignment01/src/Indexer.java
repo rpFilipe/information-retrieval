@@ -1,10 +1,19 @@
 
 import Structures.Posting;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -54,11 +63,27 @@ public class Indexer {
             List<Posting> tmp = entry.getValue();
             print = print + "Key: " + entry.getKey();
             for (Posting p : tmp) {
-                print = print + " DocId: " + p.getDocId() + " frequency: " + p.getFrequency() + "; ";
+                print = print + "\t\tDocId: " + p.getDocId() + "\tfrequency: " + p.getFrequency() + "\n";
             }
         }
 
         return print;
+    }
+
+    public void saveToFile(String filename) {
+        OutputStream outstream;
+        try {
+            outstream = new FileOutputStream(filename);
+            Writer output = new OutputStreamWriter(outstream);
+            output = new BufferedWriter(output);
+            output.write(toString());
+            output.flush();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }
 

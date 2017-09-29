@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,10 +18,14 @@ public class Stopwords {
     List<String> stopWords;
     final static Charset ENCODING = StandardCharsets.UTF_8;
 
-    public Stopwords(String cLocation) throws IOException {
-        Path path = Paths.get(cLocation);
-        stopWords = Files.readAllLines(path, ENCODING);
-        //System.out.println("List of stop words: " + stopWords.toString());
+    public Stopwords(String cLocation) {
+        try {
+            Path path = Paths.get(cLocation);
+            stopWords = Files.readAllLines(path, ENCODING);
+            //System.out.println("List of stop words: " + stopWords.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(Stopwords.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -32,3 +38,4 @@ public class Stopwords {
         return stopWords.contains(token);
     }
 }
+

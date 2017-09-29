@@ -1,6 +1,7 @@
 
 import Structures.Posting;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,7 +19,7 @@ public class Indexer {
     }
 
     public void addTerm(String keyTerm, Posting p) {
-        List<Posting> pListLoad = null;
+        List<Posting> pListLoad = new LinkedList<>();
         if (map.containsKey(keyTerm)) {
             pListLoad = map.get(keyTerm);
             for (Posting pload : pListLoad) {
@@ -28,7 +29,7 @@ public class Indexer {
                 } else {
                     if (pListLoad.add(new Posting(p.getDocId()))) {
                         //Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.getDocId() > rhs.getDocId() ? -1 : (lhs.getDocId() < rhs.getDocId()) ? 1 : 0 );
-                        Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.compareTo(rhs) );
+                        Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.compareTo(rhs));
                         map.put(keyTerm, pListLoad);
                     } else {
                         System.err.println("Error!");
@@ -45,9 +46,19 @@ public class Indexer {
 
         }
     }
-    
+
     @Override
-    public String toString(){
-        return "Dicionario:\n"+ map.toString();
-    } 
+    public String toString() {
+        String print = "";
+        for (Map.Entry<String, List<Posting>> entry : map.entrySet()) {
+            List<Posting> tmp = entry.getValue();
+            print = print + "Key: " + entry.getKey();
+            for (Posting p : tmp) {
+                print = print + " DocId: " + p.getDocId() + " frequency: " + p.getFrequency() + " ";
+            }
+        }
+
+        return print;
+    }
 }
+

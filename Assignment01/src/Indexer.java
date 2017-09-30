@@ -35,11 +35,13 @@ public class Indexer {
                 if (pload.getDocId() == p.getDocId()) {
                     pload.setFrequency(pload.getFrequency() + 1);
                     map.put(keyTerm, pListLoad);
+                    break;
                 } else {
                     if (pListLoad.add(new Posting(p.getDocId()))) {
                         //Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.getDocId() > rhs.getDocId() ? -1 : (lhs.getDocId() < rhs.getDocId()) ? 1 : 0 );
                         Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.compareTo(rhs));
                         map.put(keyTerm, pListLoad);
+                        break;
                     } else {
                         System.err.println("Error!");
                         return;
@@ -61,10 +63,11 @@ public class Indexer {
         String print = "";
         for (Map.Entry<String, List<Posting>> entry : map.entrySet()) {
             List<Posting> tmp = entry.getValue();
-            print = print + entry.getKey()+",";
+            print = print + entry.getKey() + ",";
             for (Posting p : tmp) {
-                print = print + p.getDocId() + ":" + p.getFrequency() + "\n";
+                print = print + p.getDocId() + ":" + p.getFrequency() + ",";
             }
+            print += "\n";
         }
 
         return print;

@@ -25,7 +25,7 @@ public class Stemmer {
      * @param token
      * @return token
      */
-    public String getStemmer(String token){
+    public String stem(String token){
         Class stemClass;
         try {
             stemClass = Class.forName("Stemmer.org.tartarus.snowball.ext." + language +"Stemmer");

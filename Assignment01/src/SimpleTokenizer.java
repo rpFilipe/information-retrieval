@@ -32,5 +32,6 @@ public class SimpleTokenizer extends Tokenizer {
         });
         
         list.removeAll(tmp);
+        return list;
     }
 }

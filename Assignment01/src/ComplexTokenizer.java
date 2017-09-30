@@ -1,8 +1,10 @@
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -14,16 +16,28 @@ import java.util.List;
  */
 public class ComplexTokenizer extends Tokenizer{
     
-    public ComplexTokenizer() {
+    private Stopwords stp;
+    private Stemmer stm;
+    private int minTokenLenght;
+    
+    public ComplexTokenizer(String stopWords, String stemmer, int minTokenLenght) {
+        stp = new Stopwords(stopWords);
+        stm = new Stemmer(stemmer);
+        this.minTokenLenght = minTokenLenght;
     }
     
     @Override
     public List contentProcessor(String sInput) {
         
         // tratar a string quanto aos caracteres especiais
-
-        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
-
+        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" ")));
+        
+        list.stream()
+                .filter(s-> s.length() >= minTokenLenght)
+                .filter(s-> !stp.isStopWord(s))
+                .map(s-> stm.stem(s))
+                .collect(Collectors.toList());
+        
         return list;
     }
 }

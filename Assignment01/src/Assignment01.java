@@ -53,14 +53,14 @@ public class Assignment01 {
 
                     for (String s : tokenList) {
                         docId = doc.getDocId();
-                        System.out.println("Term: "+s + " DocID: "+docId);
-                        //indx.addTerm(s, new Posting(docId));
+                        //System.out.println("Term: "+s + " DocID: "+docId);
+                        indx.addTerm(s, new Posting(docId));
                     }
                     //System.out.println(indx.toString());
-                    break;
-//                    if(count == 500)
-//                        break;
-//                    count++;
+                    //break;
+                    if(count == 50)
+                        break;
+                    count++;
                      
                 }
                 indx.saveToFile(args[3]);

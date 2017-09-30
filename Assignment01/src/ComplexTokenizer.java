@@ -30,14 +30,13 @@ public class ComplexTokenizer extends Tokenizer{
     public List contentProcessor(String sInput) {
         
         // tratar a string quanto aos caracteres especiais
-        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" ")));
+        List<String> list = new ArrayList<>(Arrays.asList(sInput.split("\\W")));
         
-        list.stream()
+        list = list.stream()
                 .filter(s-> s.length() >= minTokenLenght)
                 .filter(s-> !stp.isStopWord(s))
                 .map(s-> stm.stem(s))
                 .collect(Collectors.toList());
-        
         return list;
     }
 }

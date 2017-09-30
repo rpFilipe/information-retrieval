@@ -55,7 +55,7 @@ public class Indexer {
         }else{
             if(pListLoad.contains(p)){
                 Posting newPosting = getPosting(pListLoad, p);
-                p.setFrequency(p.getFrequency() + 1);
+                newPosting.setFrequency(p.getFrequency() + 1);
                 pListLoad.remove(p);
                 pListLoad.add(newPosting);
             }else{

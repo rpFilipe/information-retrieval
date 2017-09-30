@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,48 +20,40 @@ import java.util.logging.Logger;
  */
 public class Indexer {
 
-    private Map<String, List<Posting>> map;
+    private Map<String, Set<Posting>> map;
 
     public Indexer() {
         this.map = new TreeMap<>();
     }
 
     public void addTerm(String keyTerm, Posting p) {
-        List<Posting> pListLoad = new LinkedList<>();
+        Set<Posting> pListLoad = new TreeSet<>();
         if (map.containsKey(keyTerm)) {
             pListLoad = map.get(keyTerm);
             for (Posting pload : pListLoad) {
-                if (pload.getDocId() == p.getDocId()) {
+                if (pload.compareTo(p) == 0) { //   .getDocId() == p.getDocId()) {
                     pload.setFrequency(pload.getFrequency() + 1);
                     map.put(keyTerm, pListLoad);
                     break;
                 } else {
-                    if (pListLoad.add(new Posting(p.getDocId()))) {
-                        //Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.getDocId() > rhs.getDocId() ? -1 : (lhs.getDocId() < rhs.getDocId()) ? 1 : 0 );
-                        Collections.sort(pListLoad, (Posting lhs, Posting rhs) -> lhs.compareTo(rhs));
+                    if (pListLoad.add(p)) {
                         map.put(keyTerm, pListLoad);
                         break;
-                    } else {
-                        System.err.println("Error!");
-                        return;
                     }
                 }
             }
         } else {
-            if (pListLoad.add(new Posting(p.getDocId()))) {
+            if (pListLoad.add(p)) {
                 map.put(keyTerm, pListLoad);
-            } else {
-                System.err.println("Error!");
             }
-
         }
     }
 
     @Override
     public String toString() {
         String print = "";
-        for (Map.Entry<String, List<Posting>> entry : map.entrySet()) {
-            List<Posting> tmp = entry.getValue();
+        for (Map.Entry<String, Set<Posting>> entry : map.entrySet()) {
+            Set<Posting> tmp = entry.getValue();
             print = print + entry.getKey() + ",";
             for (Posting p : tmp) {
                 print = print + p.getDocId() + ":" + p.getFrequency() + ",";

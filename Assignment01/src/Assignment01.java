@@ -1,5 +1,8 @@
 
-import java.io.IOException;
+import Structures.Document;
+import Structures.Posting;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,50 +21,70 @@ public class Assignment01 {
 
     public static void main(String[] args) {
         
-        if(args.length !=3){
+        if(args.length !=4){
             usage();
             return;
         }
         
         try {
+            Document doc;
             String cLocation = args[0];
+
             System.out.println("Reading the corpus from " + cLocation);
-            CorpusReader cr = new CorpusReader(cLocation);
-            //cr.printCorpusDocuments();
-            while (cr.hasNext()) {
-                cr.next();
-
-            }
-
-            System.out.println("parsing finished");
-
-            cLocation = args[1];
-            System.out.println("Loading stopwords list from " + cLocation);
+            System.out.println("Loading stopwords list from " + args[1]);
+            CorpusReader cr;
             Tokenizer stk = new SimpleTokenizer();
             Tokenizer ctk = new ComplexTokenizer();
-      
-            System.out.println("Document Processor started...");
+            // estrutura de dados com os tokens
+            List<String> tokenList = new ArrayList<>();
+            Stemmer stemmer = new Stemmer(args[2]); 
+            Indexer indx = new Indexer();
+            String term = "";
+            Stopwords sw = new Stopwords(args[1]);
+            int docId;
+            // para testar um numero limitado de corpus
+            int count = 0;
             
-            // falta associar aos corpus reader
+            System.out.println("Document Processor initialized...");
             try {
-                Stopwords sw = new Stopwords(cLocation);
-            } catch (IOException ex) {
+                cr = new CorpusReader(cLocation);
+
+                //cr.printCorpusDocuments();
+                while (cr.hasNext()) {
+                    doc = ((Document) cr.next());
+                    tokenList = stk.contentProcessor(doc.getContent());
+
+                    for(String s : tokenList)
+                    {
+                        if(!sw.isStopWord(s)){
+                            term = stemmer.getStemmer(s);
+                            docId = doc.getDocId();
+                            //System.out.println("Term: "+term + " DocID: "+docId);
+                            indx.addTerm(term, new Posting(docId));
+                        }
+                    }
+                    //System.out.println(indx.toString());
+                    indx.saveToFile(args[3]);
+
+                    /*if(count == 10)
+                        break;
+                    count++;
+                    */
+                }
+                System.out.println("Document Processor finished...");
+            } catch (SAXException ex) {
                 Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Stemmer stemmer = new Stemmer("args[2]"); 
-
-            System.out.println("Document Processor finished...");
-
-        } catch (ParserConfigurationException ex) {
+    
+        }catch (ParserConfigurationException ex) {
             Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
     
     private static void usage()
     {
-        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> ");
-        System.err.println("Example: <cranfield/> <stopwords/stopwords.txt> <english> ");
+        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
+        System.err.println("Example: cranfield/ stopwords/stopwords.txt english test.txt");
     }
 }
+

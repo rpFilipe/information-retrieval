@@ -23,7 +23,7 @@ public class SimpleTokenizer extends Tokenizer {
     
     @Override
     public List contentProcessor(String sInput) {
-       sInput = sInput.toLowerCase().replaceAll("[^A-Za-z0-9]", " ");
+       sInput = sInput.toLowerCase().replaceAll("[^A-Za-z]", " ");
 
         List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
         List<String> tmp = new ArrayList<>();

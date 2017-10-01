@@ -42,7 +42,7 @@ public class XMLParser {
                 } else if (isToIgnore) {
                     isToIgnore = false;
                 } else {
-                    content = content + " " + new String(ch, start, length).trim();
+                    content = content + " " + new String(ch, start, length);
                 }
 
             }

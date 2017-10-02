@@ -45,22 +45,13 @@ public class Assignment01 {
             System.out.println("Document Processor initialized...");
             try {
                 cr = new CorpusReader(cLocation);
-
+                    
                 //cr.printCorpusDocuments();
                 while (cr.hasNext()) {
                     doc = ((Document) cr.next());
                     tokenList = ctk.contentProcessor(doc.getContent());
 
-                    for (String s : tokenList) {
-                        docId = doc.getDocId();
-                        //System.out.println("Term: "+s + " DocID: "+docId);
-                        indx.addTerm(s, new Posting(docId));
-                    }
-                    //System.out.println(indx.toString());
-                    //break;
-                    if(count == 50)
-                        break;
-                    count++;
+                    indx.indexDoc(doc.getDocId(), tokenList);
                      
                 }
                 indx.saveToFile(args[3]);

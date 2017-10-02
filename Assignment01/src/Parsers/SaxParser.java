@@ -1,3 +1,5 @@
+package Parsers;
+
 
 import Structures.Document;
 import java.io.IOException;
@@ -17,14 +19,14 @@ import org.xml.sax.SAXException;
  *
  * @author rpfilipe
  */
-public class XMLParser {
+public class SaxParser {
 
     private SAXParserFactory factory;
     private SAXParser saxParser;
     private DefaultHandler handler;
     private Document doc;
 
-    public XMLParser() throws ParserConfigurationException, SAXException {
+    public SaxParser() throws ParserConfigurationException, SAXException {
         factory = SAXParserFactory.newInstance();
         saxParser = factory.newSAXParser();
         handler = new DefaultHandler() {

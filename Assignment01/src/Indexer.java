@@ -7,12 +7,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -20,57 +25,45 @@ import java.util.logging.Logger;
  */
 public class Indexer {
 
-    private Map<String, TreeSet<Posting>> map;
+    private HashMap<String, LinkedList<Posting>> map;
 
     public Indexer() {
-        this.map = new TreeMap<>();
+        this.map = new HashMap<>();
     }
-
-    public void addTerm(String keyTerm, Posting p) {
-        TreeSet<Posting> pListLoad = new TreeSet<>();
-//        if (map.containsKey(keyTerm)) {
-//            pListLoad = map.get(keyTerm);
-//            for (Posting pload : pListLoad) {
-//                if (pload.compareTo(p) == 0) { //   .getDocId() == p.getDocId()) {
-//                    pload.setFrequency(pload.getFrequency() + 1);
-//                    map.put(keyTerm, pListLoad);
-//                    break;
-//                } else {
-//                    if (pListLoad.add(p)) {
-//                        map.put(keyTerm, pListLoad);
-//                        break;
-//                    }
-//                }
-//            }
-//        } else {
-//            if (pListLoad.add(p)) {
-//                map.put(keyTerm, pListLoad);
-//            }
-//        }
-        pListLoad = map.get(keyTerm);
-        if(pListLoad == null){
-            pListLoad = new TreeSet<>();
-             pListLoad.add(p);
-            map.put(keyTerm, pListLoad);
-        }else{
-            if(pListLoad.contains(p)){
-                Posting newPosting = getPosting(pListLoad, p);
-                newPosting.setFrequency(p.getFrequency() + 1);
-                pListLoad.remove(p);
-                pListLoad.add(newPosting);
-            }else{
-                pListLoad.add(p);
-                map.put(keyTerm, pListLoad);
+    
+    public void indexDoc(int docId, List tokens) {
+        
+        Map<String, Long> result = (Map<String, Long>) tokens.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        
+        for (Map.Entry<String, Long> entry : result.entrySet()) {
+            String key = entry.getKey();
+            int freq =entry.getValue().intValue();
+            
+            LinkedList postings = map.get(key);
+            
+            // First time the term appears
+            if(postings == null){
+                postings = new LinkedList();
+                postings.add(new Posting(docId, freq));
+                map.put(key, postings);
             }
+            else{
+               postings.add(new Posting(docId, freq));
+               map.put(key, postings);
+            }
+            
+        
+            
         }
-
+        
     }
 
     @Override
     public String toString() {
         String print = "";
-        for (Map.Entry<String, TreeSet<Posting>> entry : map.entrySet()) {
-            Set<Posting> tmp = entry.getValue();
+        for (Map.Entry<String, LinkedList<Posting>> entry : map.entrySet()) {
+            LinkedList<Posting> tmp = entry.getValue();
             print = print + entry.getKey() + " -> ";
             for (Posting p : tmp) {
                 print = print + p.getDocId() + ":" + p.getFrequency() + ",";
@@ -95,12 +88,6 @@ public class Indexer {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }
-    
-    private Posting getPosting(TreeSet treeset, Posting p) {
-        Object ceil  = treeset.ceiling(p); // least elt >= key
-        Object floor = treeset.floor(p);   // highest elt <= key
-        return ceil == floor? (Posting)ceil : null; 
     }
 }
 

@@ -21,6 +21,11 @@ public class Posting implements Comparable{
         this.frequency = 1;
     }
 
+    public Posting(int docId, Integer frequency) {
+        this.docId = docId;
+        this.frequency = frequency;
+    }
+
     public int getDocId() {
         return docId;
     }

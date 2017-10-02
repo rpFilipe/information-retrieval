@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,13 +16,13 @@ import java.util.logging.Logger;
  */
 public class Stopwords {
 
-    List<String> stopWords;
+    TreeSet<String> stopWords;
     final static Charset ENCODING = StandardCharsets.UTF_8;
 
     public Stopwords(String cLocation) {
         try {
             Path path = Paths.get(cLocation);
-            stopWords = Files.readAllLines(path, ENCODING);
+            stopWords = new TreeSet(Files.readAllLines(path, ENCODING));
             //System.out.println("List of stop words: " + stopWords.toString());
         } catch (IOException ex) {
             Logger.getLogger(Stopwords.class.getName()).log(Level.SEVERE, null, ex);

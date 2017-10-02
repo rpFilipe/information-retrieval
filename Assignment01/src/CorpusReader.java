@@ -1,7 +1,10 @@
 
+import Parsers.DOMParser;
+import Parsers.SaxParser;
 import Structures.Document;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
@@ -26,7 +29,7 @@ public class CorpusReader implements Iterator<Object>{
     private File[] corpus;
     private int currentIndex;
     private int corpusSize;
-    private XMLParser parser;
+    private DOMParser parser;
     
     
     public CorpusReader(String cLocation) throws ParserConfigurationException, SAXException {
@@ -35,8 +38,9 @@ public class CorpusReader implements Iterator<Object>{
         // corpus = folder.listFiles((File file) -> file.getName().endsWith(".xml"));
         currentIndex = 0;
         corpus = folder.listFiles();
+        Arrays.sort(corpus);
         corpusSize = corpus.length;
-        parser = new XMLParser();
+        parser = new DOMParser();
     }
     
     public void printCorpusDocuments() {

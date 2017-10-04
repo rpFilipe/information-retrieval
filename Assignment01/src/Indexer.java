@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -58,15 +57,21 @@ public class Indexer {
         }
         
     }
+    
+    public int getVocabularySize(){
+        Set entries = map.entrySet();
+        return entries.size();
+    }
 
     @Override
     public String toString() {
         String print = "";
-        for (Map.Entry<String, LinkedList<Posting>> entry : map.entrySet()) {
-            LinkedList<Posting> tmp = entry.getValue();
-            print = print + entry.getKey() + " -> ";
+        TreeSet<String> orderd_tokens = new TreeSet(map.keySet());
+        for (String s : orderd_tokens) {
+            LinkedList<Posting> tmp = map.get(s);
+            print = print + s;
             for (Posting p : tmp) {
-                print = print + p.getDocId() + ":" + p.getFrequency() + ",";
+                print = print +"," + p.getDocId() + ":" + p.getFrequency();
             }
             print += "\n";
         }

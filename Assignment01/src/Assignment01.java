@@ -21,7 +21,7 @@ public class Assignment01 {
 
     public static void main(String[] args) {
 
-        if (args.length != 4) {
+        if (args.length != 5) {
             usage();
             return;
         }
@@ -33,7 +33,8 @@ public class Assignment01 {
             System.out.println("Reading the corpus from " + cLocation);
             System.out.println("Loading stopwords list from " + args[1]);
             CorpusReader cr;
-            Tokenizer ctk = new ComplexTokenizer(args[1], args[2], 3);
+            Tokenizer stk = new SimpleTokenizer(Integer.parseInt(args[3]));
+            Tokenizer ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
             // estrutura de dados com os tokens
             List<String> tokenList = new ArrayList<>();
             Indexer indx = new Indexer();
@@ -49,12 +50,12 @@ public class Assignment01 {
                 //cr.printCorpusDocuments();
                 while (cr.hasNext()) {
                     doc = ((Document) cr.next());
-                    tokenList = ctk.contentProcessor(doc.getContent());
-
+                    //tokenList = ctk.contentProcessor(doc.getContent());
+                    tokenList = stk.contentProcessor(doc.getContent());
                     indx.indexDoc(doc.getDocId(), tokenList);
                      
                 }
-                indx.saveToFile(args[3]);
+                indx.saveToFile(args[4]);
                 System.out.println("Document Processor finished...");
             } catch (SAXException ex) {
                 Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,6 +68,6 @@ public class Assignment01 {
 
     private static void usage() {
         System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
-        System.err.println("Example: cranfield/ stopwords/stopwords.txt english test.txt");
+        System.err.println("Example: cranfield/ stopwords/stopwords.txt english  minimumtokenlenght test.txt");
     }
 }

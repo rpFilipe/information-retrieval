@@ -12,8 +12,11 @@ import java.util.List;
  * or more characters.
  */
 public class SimpleTokenizer extends Tokenizer {
+    
+    private int minTokenLenght;
 
-    public SimpleTokenizer() {
+    public SimpleTokenizer(int minTokenLenght) {
+        this.minTokenLenght = minTokenLenght;
     }
 
     /**
@@ -23,15 +26,18 @@ public class SimpleTokenizer extends Tokenizer {
     
     @Override
     public List contentProcessor(String sInput) {
-       sInput = sInput.toLowerCase().replaceAll("[^A-Za-z]", " ");
+       //sInput = sInput.toLowerCase();
 
-        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
+        List<String> list = new ArrayList<>(Arrays.asList(sInput.split("[^A-Za-z]")));
         List<String> tmp = new ArrayList<>();
-        list.stream().filter((s) -> (s.length() < 3)).forEachOrdered((s) -> {
+        list.stream()
+                .filter((s) -> (s.length() >= minTokenLenght))
+                .map(s -> s.toLowerCase())
+                .forEachOrdered((s) -> {
             tmp.add(s);
         });
         
-        list.removeAll(tmp);
-        return list;
+        //list.removeAll(tmp);
+        return tmp;
     }
 }

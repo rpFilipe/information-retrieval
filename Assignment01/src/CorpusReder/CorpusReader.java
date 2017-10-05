@@ -1,3 +1,5 @@
+package CorpusReder;
+
 
 import Parsers.DOMParser;
 import Parsers.SaxParser;

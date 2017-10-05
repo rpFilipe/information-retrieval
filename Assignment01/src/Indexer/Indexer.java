@@ -1,3 +1,5 @@
+package Indexer;
+
 
 import Structures.Posting;
 import java.io.BufferedWriter;
@@ -82,7 +84,7 @@ public class Indexer {
     public void saveToFile(String filename) {
         OutputStream outstream;
         try {
-            outstream = new FileOutputStream(filename);
+            outstream = new FileOutputStream("output/"+filename);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
             output.write(toString());

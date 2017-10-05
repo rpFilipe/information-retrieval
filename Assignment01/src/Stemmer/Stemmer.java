@@ -1,3 +1,5 @@
+package Stemmer;
+
 
 import Stemmer.org.tartarus.snowball.SnowballStemmer;
 

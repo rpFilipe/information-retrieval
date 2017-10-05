@@ -1,4 +1,9 @@
 
+import CorpusReder.CorpusReader;
+import Tokenizer.SimpleTokenizer;
+import Tokenizer.ComplexTokenizer;
+import Tokenizer.Tokenizer;
+import Indexer.Indexer;
 import Structures.Document;
 import Structures.Posting;
 import java.util.ArrayList;
@@ -68,6 +73,6 @@ public class Assignment01 {
 
     private static void usage() {
         System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
-        System.err.println("Example: cranfield/ stopwords/stopwords.txt english  minimumtokenlenght test.txt");
+        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english  3 test.txt");
     }
 }

@@ -3,10 +3,10 @@ package Stemmer;
 
 import Stemmer.org.tartarus.snowball.SnowballStemmer;
 
-
 /**
- *
- * @author joana
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  */
 public class Stemmer {
     /**

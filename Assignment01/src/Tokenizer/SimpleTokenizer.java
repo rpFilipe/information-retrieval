@@ -6,8 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  *
- * @author joanaconde 
+ * 
  * 
  * A simple tokenizer that splits on whitespace, lowercases
  * tokens, removes all non- alphabetic characters, and keeps only terms with 3

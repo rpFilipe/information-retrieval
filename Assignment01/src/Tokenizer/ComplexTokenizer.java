@@ -12,8 +12,11 @@ import java.util.stream.Collectors;
 
 
 /**
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  *
- * @author joana
+ * 
  * 
  * A tokenizer class that returns the tokens of an input text paying particular
  * attention to characters that need special handling ('.'; ','; '-'; etc.).

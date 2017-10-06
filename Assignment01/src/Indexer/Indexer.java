@@ -21,8 +21,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- *
- * @author joana
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  */
 public class Indexer {
 

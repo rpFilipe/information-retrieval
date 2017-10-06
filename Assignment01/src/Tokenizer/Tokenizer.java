@@ -1,17 +1,14 @@
 package Tokenizer;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
- * @author joana
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  */
 public class Tokenizer {
 

@@ -7,6 +7,7 @@ import Indexer.Indexer;
 import Structures.Document;
 import Structures.Posting;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +58,7 @@ public class Assignment01 {
                      
                 }
                 indx.saveToFile(args[4]);
+                //List l = indx.getTermInOneDoc();
                 System.out.println("Document Processor finished...");
             } catch (SAXException ex) {
                 Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);

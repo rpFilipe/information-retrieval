@@ -61,9 +61,28 @@ public class Indexer {
         
     }
     
+    /**
+     * metodo para saber o tamanho do vocabulario
+     * @return 
+     */
     public int getVocabularySize(){
         Set entries = map.entrySet();
         return entries.size();
+    }
+    
+    /**
+     * metodo para listar os 10 primeiros termos (por ordem alfabetica) que aparecem em apenas um documento
+     * @return list
+     */
+    public List getTermInOneDoc(){
+        List<String> list = map.entrySet()
+                     .stream()
+                     .filter(i-> i.getValue().size() == 1)
+                     .map(Map.Entry::getKey)
+                     .sorted()
+                     .collect(Collectors.toList());
+        
+        return list.subList(0, 10);
     }
 
     @Override

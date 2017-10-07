@@ -103,6 +103,10 @@ public class Indexer {
         return list.subList(0, 10);
     }
 
+    /**
+     * metodo que imprime o vocabulario com o formato term,doc id:term freq
+     * @return print
+     */
     @Override
     public String toString() {
         String print = "";
@@ -119,6 +123,10 @@ public class Indexer {
         return print;
     }
 
+    /**
+     * metodo que grava o vocabulario para o ficheiro, passado como argumento, na pasta output/filename
+     * @param filename 
+     */
     public void saveToFile(String filename) {
         OutputStream outstream;
         try {

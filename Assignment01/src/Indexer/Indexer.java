@@ -102,10 +102,7 @@ public class Indexer {
         
         list = list.subList(0, 10);
         
-        for(String l : list)
-            System.out.println(l);
-        //return list.subList(0, 10);
-        return list;
+        return list.subList(0, 10);
     }
 
     @Override

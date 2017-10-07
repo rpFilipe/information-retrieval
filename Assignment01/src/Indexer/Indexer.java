@@ -9,10 +9,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collections;
+import static java.util.Comparator.comparingInt;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import static java.util.Map.Entry.comparingByValue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -83,6 +87,25 @@ public class Indexer {
                      .collect(Collectors.toList());
         
         return list.subList(0, 10);
+    }
+    
+    /**
+     * metodo para listar os 10 primeiros termos com maior frequencia em documentos
+     * @return list 
+     */
+    public List getTermHigherFreq(){;
+        List<String> list = map.entrySet()
+                     .stream()
+                     .sorted(Map.Entry.comparingByValue(Collections.reverseOrder(comparingInt((list1) -> list1.size())))) //comparingInt(List::size)))
+                     .map(Map.Entry::getKey)
+                     .collect(Collectors.toList());
+        
+        list = list.subList(0, 10);
+        
+        for(String l : list)
+            System.out.println(l);
+        //return list.subList(0, 10);
+        return list;
     }
 
     @Override

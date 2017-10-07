@@ -100,8 +100,6 @@ public class Indexer {
                      .map(Map.Entry::getKey)
                      .collect(Collectors.toList());
         
-        list = list.subList(0, 10);
-        
         return list.subList(0, 10);
     }
 

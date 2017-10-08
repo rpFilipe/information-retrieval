@@ -20,7 +20,7 @@ public class Tokenizer {
 
     public List contentProcessor(String sInput) {
 
-        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" ")));
+        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
 
         return list;
     }

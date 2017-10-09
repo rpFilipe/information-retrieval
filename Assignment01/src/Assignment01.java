@@ -35,7 +35,7 @@ public class Assignment01 {
             System.out.println("Reading the corpus from " + cLocation);
             System.out.println("Loading stopwords list from " + args[1]);
             CorpusReader cr;
-            Tokenizer stk = new SimpleTokenizer(Integer.parseInt(args[3]));
+            //Tokenizer stk = new SimpleTokenizer(Integer.parseInt(args[3]));
             Tokenizer ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
             // estrutura de dados com os tokens
             List<String> tokenList = new ArrayList<>();
@@ -53,7 +53,7 @@ public class Assignment01 {
                 while (cr.hasNext()) {
                     doc = ((Document) cr.next());
                     //tokenList = ctk.contentProcessor(doc.getContent());
-                    tokenList = stk.contentProcessor(doc.getContent());
+                    tokenList = ctk.contentProcessor(doc.getContent());
                     indx.indexDoc(doc.getDocId(), tokenList);
                      
                 }

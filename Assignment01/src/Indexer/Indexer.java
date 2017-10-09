@@ -104,37 +104,31 @@ public class Indexer {
     }
 
     /**
-     * metodo que imprime o vocabulario com o formato term,doc id:term freq
-     * @return print
-     */
-    @Override
-    public String toString() {
-        String print = "";
-        TreeSet<String> orderd_tokens = new TreeSet(map.keySet());
-        for (String s : orderd_tokens) {
-            LinkedList<Posting> tmp = map.get(s);
-            print = print + s;
-            for (Posting p : tmp) {
-                print = print +"," + p.getDocId() + ":" + p.getFrequency();
-            }
-            print += "\n";
-        }
-
-        return print;
-    }
-
-    /**
      * metodo que grava o vocabulario para o ficheiro, passado como argumento, na pasta output/filename
      * @param filename 
      */
     public void saveToFile(String filename) {
-        OutputStream outstream;
+        OutputStream outstream;      
+        
         try {
-            outstream = new FileOutputStream("output/"+filename);
+            outstream = new FileOutputStream(filename);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
-            output.write(toString());
-            output.flush();
+            TreeSet<String> orderd_tokens = new TreeSet(map.keySet());
+            
+            for (String s : orderd_tokens) {
+                String print = "";
+                LinkedList<Posting> tmp = map.get(s);
+                print = print + s;
+                for (Posting p : tmp) {
+                    print = print +"," + p;
+                }
+                print += "\n";
+                output.write(print);
+                output.flush();
+        }
+            
+            output.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

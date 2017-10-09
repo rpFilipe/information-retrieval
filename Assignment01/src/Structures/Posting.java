@@ -45,4 +45,11 @@ public class Posting implements Comparable{
 
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "" + docId + ":" + frequency;
+    }
+    
+    
 }

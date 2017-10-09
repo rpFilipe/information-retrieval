@@ -79,6 +79,16 @@ public class ComplexTokenizer implements Tokenizer{
             // do nothing
         }
         
+        // check if token is a percentage
+        if(s.contains("%")){
+            try{
+                double d = Double.parseDouble(s.split("%")[0]);
+                return s;
+            }catch(NumberFormatException e){
+                // do nothing
+            }
+        }
+        
         
         
         // check if is a monogram

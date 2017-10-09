@@ -59,7 +59,8 @@ public class Assignment01 {
                 }
                 indx.saveToFile(args[4]);
                 //indx.getTermInOneDoc();
-                //indx.getTermHigherFreq();
+                //ndx.getTermHigherFreq();
+                System.out.println(indx.getTermInOneDoc());
                 System.out.println("Document Processor finished...");
             } catch (SAXException ex) {
                 Logger.getLogger(Assignment01.class.getName()).log(Level.SEVERE, null, ex);
@@ -72,6 +73,6 @@ public class Assignment01 {
 
     private static void usage() {
         System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
-        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english  3 test.txt");
+        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt");
     }
 }

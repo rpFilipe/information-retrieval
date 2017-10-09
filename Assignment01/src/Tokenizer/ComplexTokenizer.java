@@ -52,6 +52,7 @@ public class ComplexTokenizer extends Tokenizer{
          
         createdTokens = new ArrayList<>();
         list = list.stream()
+                .map(s -> s.replaceAll("[\\[\\](){}'/\\+=,]",""))
                 .filter(s-> s.length() >= minTokenLenght)
                 .filter(s-> !stp.isStopWord(s))
                 .map(s -> s.toLowerCase())
@@ -62,6 +63,7 @@ public class ComplexTokenizer extends Tokenizer{
         
         createdTokens = createdTokens.stream()
                 .filter(s -> s.length() >= minTokenLenght)
+                .filter(s-> !stp.isStopWord(s))
                 .map(s -> stm.stem(s))
                 .collect(Collectors.toList());
         
@@ -69,9 +71,6 @@ public class ComplexTokenizer extends Tokenizer{
     }
     
     private String specialCasesConverter(String s) {
-        
-            // ignoring all braces, +, /, ='
-        s = s.replaceAll("[\\[\\](){}',/\\+=]","");
         
         // check if token is a number
         try{
@@ -103,7 +102,7 @@ public class ComplexTokenizer extends Tokenizer{
         if (matcher.matches()){
             String[] parts = s.split("@");
             // adding the provider
-            createdTokens.add(parts[0].split(".")[0]);
+            createdTokens.add(parts[0].split("\\.")[0]);
             //returning the user
             return parts[0];
         }
@@ -119,7 +118,11 @@ public class ComplexTokenizer extends Tokenizer{
                     .collect(Collectors.toList());
             
             createdTokens.addAll(hyphenTokens);
-            return s;
+            
+            // cleaning up token's baggage
+            if(s.charAt(0) == '.' || s.charAt(0) == '-' || s.charAt(s.length()-1) == '.' || s.charAt(s.length()-1) == '-')
+                return null;
+            else return s;
         }
         
         // only pass words

@@ -23,7 +23,7 @@ public class Assignment01 {
 
     public static void main(String[] args) {
 
-        if (args.length != 5) {
+        if (args.length != 6) {
             usage();
             return;
         }
@@ -31,19 +31,26 @@ public class Assignment01 {
         try {
             Document doc;
             String cLocation = args[0];
-
+            CorpusReader cr;        
+            Tokenizer ctk;
+            
+            if(args[5].equalsIgnoreCase("complex"))
+                ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
+            else if(args[5].equalsIgnoreCase("simple"))
+                ctk = new SimpleTokenizer(Integer.parseInt(args[3]));
+            else{
+                usage();
+                return;
+            }
+            
             System.out.println("Reading the corpus from " + cLocation);
             System.out.println("Loading stopwords list from " + args[1]);
-            CorpusReader cr;
-            //Tokenizer stk = new SimpleTokenizer(Integer.parseInt(args[3]));
-            Tokenizer ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
+            
             // estrutura de dados com os tokens
             List<String> tokenList = new ArrayList<>();
             Indexer indx = new Indexer();
             int docId;
 
-            // para testar um numero limitado de corpus
-            int count = 0;
 
             System.out.println("Document Processor initialized...");
             try {

@@ -1,3 +1,4 @@
+
 import CorpusReder.CorpusReader;
 import Tokenizer.SimpleTokenizer;
 import Tokenizer.ComplexTokenizer;
@@ -22,7 +23,7 @@ public class Assignment01 {
 
     public static void main(String[] args) {
 
-        if (args.length != 6) {
+        if (args.length != 5) {
             usage();
             return;
         }
@@ -35,16 +36,7 @@ public class Assignment01 {
             System.out.println("Loading stopwords list from " + args[1]);
             CorpusReader cr;
             //Tokenizer stk = new SimpleTokenizer(Integer.parseInt(args[3]));
-            Tokenizer tk;
-            if(args[5].equalsIgnoreCase("complex"))
-                tk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
-            else if (args[5].equalsIgnoreCase("simple"))
-                tk =new SimpleTokenizer(Integer.parseInt(args[3]));
-            else
-            {
-                usage();
-                return;
-            }
+            Tokenizer ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
             // estrutura de dados com os tokens
             List<String> tokenList = new ArrayList<>();
             Indexer indx = new Indexer();
@@ -57,10 +49,11 @@ public class Assignment01 {
             try {
                 cr = new CorpusReader(cLocation);
                     
+                //cr.printCorpusDocuments();
                 while (cr.hasNext()) {
                     doc = ((Document) cr.next());
                     //tokenList = ctk.contentProcessor(doc.getContent());
-                    tokenList = tk.contentProcessor(doc.getContent());
+                    tokenList = ctk.contentProcessor(doc.getContent());
                     indx.indexDoc(doc.getDocId(), tokenList);
                      
                 }
@@ -79,6 +72,6 @@ public class Assignment01 {
 
     private static void usage() {
         System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
-        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt complex");
+        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt");
     }
 }

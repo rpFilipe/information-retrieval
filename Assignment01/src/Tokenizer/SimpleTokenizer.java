@@ -16,7 +16,7 @@ import java.util.List;
  * tokens, removes all non- alphabetic characters, and keeps only terms with 3
  * or more characters.
  */
-public class SimpleTokenizer extends Tokenizer {
+public class SimpleTokenizer implements Tokenizer {
     
     private int minTokenLenght;
 

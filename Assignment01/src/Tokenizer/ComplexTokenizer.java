@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * A tokenizer class that returns the tokens of an input text paying particular
  * attention to characters that need special handling ('.'; ','; '-'; etc.).
  */
-public class ComplexTokenizer extends Tokenizer{
+public class ComplexTokenizer implements Tokenizer{
     
     private Stopwords stp;
     private Stemmer stm;

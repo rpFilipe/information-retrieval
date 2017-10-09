@@ -10,18 +10,7 @@ import java.util.List;
  * @author Joana Conde 
  * @author Ricardo Filipe
  */
-public class Tokenizer {
+public interface Tokenizer {
 
-    /**
-     * Construtor do tokenizer
-     */
-    public Tokenizer() {
+    public List contentProcessor(String sInput);
     }
-
-    public List contentProcessor(String sInput) {
-
-        List<String> list = new ArrayList<>(Arrays.asList(sInput.split(" +")));
-
-        return list;
-    }
-}

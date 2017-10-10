@@ -54,12 +54,11 @@ public class Assignment01 {
 
             System.out.println("Document Processor initialized...");
             try {
-                cr = new CorpusReader(cLocation);
-                    
+                cr = new CorpusReader(cLocation);                    
                 //cr.printCorpusDocuments();
+                
                 while (cr.hasNext()) {
                     doc = ((Document) cr.next());
-                    //tokenList = ctk.contentProcessor(doc.getContent());
                     tokenList = ctk.contentProcessor(doc.getContent());
                     indx.indexDoc(doc.getDocId(), tokenList);
                      
@@ -78,7 +77,7 @@ public class Assignment01 {
     }
 
     private static void usage() {
-        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index>");
-        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt");
+        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index> <tokenizer type: complex or simple>");
+        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt complex");
     }
 }

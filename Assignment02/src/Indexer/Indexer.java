@@ -153,7 +153,7 @@ public class Indexer {
                 print += "\n";
                 output.write(print);
                 output.flush();
-        }
+            }
             
             output.close();
         } catch (FileNotFoundException ex) {

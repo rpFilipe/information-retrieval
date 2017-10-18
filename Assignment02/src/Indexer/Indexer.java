@@ -164,9 +164,9 @@ public class Indexer {
 
     }
     
-    public String search(String query){
-        
-        
+    public List<Posting> getList(String query){
+        if(map.containsKey(query))
+            return map.get(query);
         return null;
     }
 }

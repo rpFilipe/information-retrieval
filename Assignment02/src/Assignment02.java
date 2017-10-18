@@ -49,9 +49,10 @@ public class Assignment02 {
             
             Scanner in = new Scanner(fqueries);
             
-            while(in.hasNext()){
-                System.out.println(in.nextLine());
-                br.search(in.nextLine());
+            while(in.hasNextLine()){
+                String line = in.nextLine();
+                System.out.println(line);
+                br.search(line);
                 
             }
             

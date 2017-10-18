@@ -15,6 +15,12 @@ public class Posting implements Comparable{
         this.docId = docId;
         this.frequency = 1;
     }
+    
+    public Posting(String s){
+        String[] p = s.split(":");
+        this.docId = Integer.parseInt(p[0]);
+        this.frequency = Integer.parseInt(p[1]);
+    }
 
     public Posting(int docId, Integer frequency) {
         this.docId = docId;

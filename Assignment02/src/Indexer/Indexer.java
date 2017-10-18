@@ -3,6 +3,7 @@ package Indexer;
 
 import Structures.Posting;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.Entry.comparingByValue;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -36,6 +38,31 @@ public class Indexer {
     public Indexer() {
         this.map = new HashMap<>();
     }
+    
+    public Indexer (String fname) throws FileNotFoundException{
+
+    File fileidx = new File(fname);
+    Scanner fsc = new Scanner(fileidx);
+    this.map = new HashMap<>();
+    
+    String line;
+    String[] tokens;
+    String term;
+    LinkedList<Posting> l;
+
+    while(fsc.hasNext()){
+        line = fsc.nextLine();
+        tokens = line.split(",");
+        term = tokens[0];
+        l = new LinkedList();
+        for(int i = 1; i < tokens.length; i++) {
+            l.add(new Posting(tokens[i]));
+        }
+
+        map.put(term, l);
+
+    }
+}
     
     public void indexDoc(int docId, List tokens) {
         
@@ -135,6 +162,12 @@ public class Indexer {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    public String search(String query){
+        
+        
+        return null;
     }
 }
 

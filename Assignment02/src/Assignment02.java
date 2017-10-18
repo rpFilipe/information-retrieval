@@ -5,6 +5,8 @@ import Structures.Document;
 import Tokenizer.ComplexTokenizer;
 import Tokenizer.SimpleTokenizer;
 import Tokenizer.Tokenizer;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,62 +25,30 @@ public class Assignment02 {
 
     public static void main(String[] args) {
 
-        if (args.length != 6) {
-            usage();
-            return;
-        }
-
         try {
-            Document doc;
-            String cLocation = args[0];
-            CorpusReader cr;        
-            Tokenizer ctk;
-            
-            if(args[5].equalsIgnoreCase("complex"))
-                ctk = new ComplexTokenizer(args[1], args[2], Integer.parseInt(args[3]));
-            else if(args[5].equalsIgnoreCase("simple"))
-                ctk = new SimpleTokenizer(Integer.parseInt(args[3]));
-            else{
+            if (args.length != 3) {
                 usage();
                 return;
             }
             
-            System.out.println("Reading the corpus from " + cLocation);
-            System.out.println("Loading stopwords list from " + args[1]);
+            File index  = new File(args[0]);
+            File queries = new File(args[1]);
             
-            // estrutura de dados com os tokens
-            List<String> tokenList = new ArrayList<>();
-            Indexer indx = new Indexer();
-            int docId;
-
-
-            System.out.println("Document Processor initialized...");
-            try {
-                cr = new CorpusReader(cLocation);                    
-                //cr.printCorpusDocuments();
-                
-                while (cr.hasNext()) {
-                    doc = ((Document) cr.next());
-                    tokenList = ctk.contentProcessor(doc.getContent());
-                    indx.indexDoc(doc.getDocId(), tokenList);
-                     
-                }
-                indx.saveToFile(args[4]);
-                //indx.getTermInOneDoc();
-                //ndx.getTermHigherFreq();
-                System.out.println("Document Processor finished...");
-            } catch (SAXException ex) {
-                Logger.getLogger(Assignment02.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        } catch (ParserConfigurationException ex) {
+            Indexer idx = new Indexer(args[0]);
+            
+            
+            
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(Assignment02.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+        
+        
+        
 
+    }
     private static void usage() {
-        System.err.println("Usage: <path to corpus folder> <path to stopwords list file> <language> <filename to write the resulting index> <tokenizer type: complex or simple>");
-        System.err.println("Example: cranfield/ src/Stopwords/stopwords.txt english 3 test.txt complex");
+        System.err.println("Usage: <index file> <queries file> <tokenizer>");
+        System.err.println("Example: index0.txt queries.txt complex");
     }
     
 }

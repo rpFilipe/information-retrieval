@@ -64,7 +64,8 @@ public class BooleanRetriever {
         
         else if( score == 'b')
         {
-           Map<Integer, Integer> qresults = (Map<Integer, Integer>) lconcat.stream()
+           Map<Integer, Integer> qresults = (Map<Integer, Integer>) Optional.ofNullable(lconcat)
+                .orElseGet(Collections::emptyList).stream()
                 .collect(Collectors.groupingBy(Posting::getDocId, summingInt((Posting::getFrequency))));
            
            qresults.entrySet().forEach((entry) -> {

@@ -5,9 +5,11 @@ import Indexer.Indexer;
 import Structures.Posting;
 import Structures.QueryResult;
 import Tokenizer.Tokenizer;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.summingInt;
@@ -50,7 +52,8 @@ public class BooleanRetriever {
         //doc score1
         if( score == 'a')
         {
-            Map<Integer, Long> qresults = (Map<Integer, Long>) lconcat.stream()
+            Map<Integer, Long> qresults = (Map<Integer, Long>) Optional.ofNullable(lconcat)
+                .orElseGet(Collections::emptyList).stream().filter(( m )-> m != null)
                 .collect(Collectors.groupingBy(Posting::getDocId, Collectors.counting()));
             
             qresults.entrySet().forEach((entry) -> {

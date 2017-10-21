@@ -1,9 +1,6 @@
 import Indexer.Indexer;
 import Retriever.BooleanRetriever;
 import Structures.QueryResult;
-import Tokenizer.ComplexTokenizer;
-import Tokenizer.SimpleTokenizer;
-import Tokenizer.Tokenizer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,34 +14,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-
-
 /**
- *
- * @author joana
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  */
 public class Assignment02 {
+    
     public static void main(String[] args) {
 
         try {
-            if (args.length != 6) {
+            if (args.length != 3) {
                 usage();
                 return;
             }
             
-            File fqueries = new File(args[4]);
-            String outFname= "queryResult.txt";
-            Tokenizer tk;
-            Indexer idx = new Indexer(args[3]);
-            if(args[5].equalsIgnoreCase("complex"))
-                tk = new ComplexTokenizer(args[0], args[1], Integer.parseInt(args[2]));
-            else if(args[5].equalsIgnoreCase("simple"))
-                tk = new SimpleTokenizer(Integer.parseInt(args[2]));
+            File fqueries = new File(args[1]);
+            char score;
+            if(args[2].equalsIgnoreCase("a") || args[2].equalsIgnoreCase("b"))
+                score = args[2].charAt(0);
             else{
                 usage();
                 return;
             }
-            BooleanRetriever br = new BooleanRetriever(tk, idx);
+            
+            String outFname= "queryResult_"+score+".txt";
+            
+            Indexer idx = new Indexer(args[0]);
+            BooleanRetriever br = new BooleanRetriever(idx.getTk(), idx);
             
             TreeSet<QueryResult> qresult;
             //cleaning old file
@@ -54,8 +51,8 @@ public class Assignment02 {
             Scanner in = new Scanner(fqueries);
             while(in.hasNextLine()){
                 String line = in.nextLine();
-                qresult = br.search(line, 'a');
-                saveinFile(outFname, qresult);
+                qresult = br.search(line, score);
+                saveinFile(outFname, qresult, score);
             }
             
             
@@ -67,17 +64,19 @@ public class Assignment02 {
 
     }
     private static void usage() {
-        System.err.println("Usage: <index file> <queries file> <tokenizer>");  //TODO
-        System.err.println("Example: src/Stopwords/stopwords.txt english 3 index.txt cranfield.queries.txt complex");
+        System.err.println("Usage: <index file> <queries file> <choose score: a or b>");  
+        System.err.println("Example: index.txt cranfield.queries.txt a");
     }
     
-    private static void saveinFile(String fname, TreeSet<QueryResult> qresult){
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score){
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
             
-            String print;
+            String print = "query_id\tdoc_id\t\tdoc_score_"+ score+"\n";
+            output.write(print);
+            output.flush();
             for(QueryResult q : qresult){
                 print = q.toString();
                 print += "\n";

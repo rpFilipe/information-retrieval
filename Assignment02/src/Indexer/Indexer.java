@@ -2,6 +2,9 @@ package Indexer;
 
 
 import Structures.Posting;
+import Tokenizer.ComplexTokenizer;
+import Tokenizer.SimpleTokenizer;
+import Tokenizer.Tokenizer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,11 +16,9 @@ import java.io.Writer;
 import java.util.Collections;
 import static java.util.Comparator.comparingInt;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Map.Entry.comparingByValue;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 public class Indexer {
 
     private HashMap<String, LinkedList<Posting>> map;
+    Tokenizer tk;
 
     public Indexer() {
         this.map = new HashMap<>();
@@ -49,7 +51,24 @@ public class Indexer {
     String[] tokens;
     String term;
     LinkedList<Posting> l;
-
+    
+    String tkData = fsc.nextLine();
+    String parsetk = tkData.split(", ")[0];
+    if(parsetk.equalsIgnoreCase("complex")){
+        String swPath = tkData.split(", ")[1];
+        String stLanguage = tkData.split(", ")[2];
+        int minlength = Integer.parseInt(tkData.split(", ")[3]);
+        tk = new ComplexTokenizer(swPath,stLanguage,minlength);
+    }
+    else if(parsetk.equalsIgnoreCase("simple")){
+        int minlength = Integer.parseInt(tkData.split(", ")[1]);
+        tk = new SimpleTokenizer(minlength);
+    }
+    else{
+        System.out.println("ERRO! Tokenizer not recognized!");
+        System.exit(-1);
+    }
+        
     while(fsc.hasNext()){
         line = fsc.nextLine();
         tokens = line.split(",");
@@ -86,10 +105,13 @@ public class Indexer {
                map.put(key, postings);
             }
             
-        
-            
         }
         
+    }
+
+    
+    public Tokenizer getTk() {
+        return tk;
     }
     
     /**
@@ -143,6 +165,7 @@ public class Indexer {
             output = new BufferedWriter(output);
             TreeSet<String> orderd_tokens = new TreeSet(map.keySet());
             
+            //String print = 
             for (String s : orderd_tokens) {
                 String print = "";
                 LinkedList<Posting> tmp = map.get(s);

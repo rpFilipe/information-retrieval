@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.summingInt;
 
 /**
- *
- * @author joana
+ * Universidade de Aveiro, DETI, Recuperação de Informação 
+ * @author Joana Conde 
+ * @author Ricardo Filipe
  */
 public class BooleanRetriever {
     
@@ -28,13 +29,11 @@ public class BooleanRetriever {
         queryId = 0;
     }
     
-    //retorna uma lista de uma classe queryresults 
     public TreeSet<QueryResult> search(String query, char score){
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
         List<Posting> lconcat = null, l = null;
         
-        //System.out.println(lquery.toString());
         for(String s : lquery)
         {
             l = idx.getList(s);
@@ -48,9 +47,6 @@ public class BooleanRetriever {
         
          TreeSet<QueryResult> queryResults = new TreeSet();
         
-        //System.out.println(lconcat.toString());
-        
-      
         //doc score1
         if( score == 'a')
         {

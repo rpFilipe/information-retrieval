@@ -49,10 +49,12 @@ public class Assignment02 {
             outstream.close();
             
             Scanner in = new Scanner(fqueries);
+            boolean firstline = true;
             while(in.hasNextLine()){
                 String line = in.nextLine();
                 qresult = br.search(line, score);
-                saveinFile(outFname, qresult, score);
+                saveinFile(outFname, qresult, score, firstline);
+                firstline = false;
             }
             
             
@@ -68,15 +70,18 @@ public class Assignment02 {
         System.err.println("Example: index.txt cranfield.queries.txt a");
     }
     
-    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score){
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score, boolean firstline){
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
             
-            String print = "query_id\tdoc_id\t\tdoc_score_"+ score+"\n";
-            output.write(print);
-            output.flush();
+            String print;
+            if(firstline) {
+                print = "query_id\tdoc_id\t\tdoc_score_"+ score+"\n";
+                output.write(print);
+                output.flush();
+            }
             for(QueryResult q : qresult){
                 print = q.toString();
                 print += "\n";

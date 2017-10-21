@@ -2,21 +2,13 @@
 package Retriever;
 
 import Indexer.Indexer;
-import Stemmer.Stemmer;
-import Stopwords.Stopwords;
 import Structures.Posting;
-import Tokenizer.ComplexTokenizer;
-import Tokenizer.SimpleTokenizer;
+import Structures.QueryResult;
 import Tokenizer.Tokenizer;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.summingInt;
 
@@ -27,15 +19,18 @@ import static java.util.stream.Collectors.summingInt;
 public class BooleanRetriever {
     
     private Tokenizer tk;
-    Indexer idx;
+    private Indexer idx;
+    private static int queryId;
     
     public BooleanRetriever(Tokenizer tk, Indexer idx){
         this.tk = tk;
         this.idx = idx; 
+        queryId = 0;
     }
     
     //retorna uma lista de uma classe queryresults 
-    public void search(String query){
+    public TreeSet<QueryResult> search(String query, char score){
+        queryId++;
         List<String> lquery = tk.contentProcessor(query);
         List<Posting> lconcat = null, l = null;
         
@@ -51,19 +46,33 @@ public class BooleanRetriever {
             }
         }
         
+         TreeSet<QueryResult> queryResults = new TreeSet();
+        
         //System.out.println(lconcat.toString());
-
+        
+      
         //doc score1
-        Map<Integer, Long> qresults1 = (Map<Integer, Long>) lconcat.stream()
+        if( score == 'a')
+        {
+            Map<Integer, Long> qresults = (Map<Integer, Long>) lconcat.stream()
                 .collect(Collectors.groupingBy(Posting::getDocId, Collectors.counting()));
+            
+            qresults.entrySet().forEach((entry) -> {
+                queryResults.add(new QueryResult(queryId, entry.getKey(), entry.getValue().intValue()));
+            });
+            
+        }
         
-        //System.out.println(qresults1.toString());
+        else if( score == 'b')
+        {
+           Map<Integer, Integer> qresults = (Map<Integer, Integer>) lconcat.stream()
+                .collect(Collectors.groupingBy(Posting::getDocId, summingInt((Posting::getFrequency))));
+           
+           qresults.entrySet().forEach((entry) -> {
+                queryResults.add(new QueryResult(queryId, entry.getKey(), entry.getValue()));
+            });
+        }
         
-        //doc score2
-        Map<Integer, Integer> qresults2 = (Map<Integer, Integer>) lconcat.stream()
-                .collect(Collectors.groupingBy(Posting::getDocId, summingInt(Posting::getFrequency)));
-        
-        //System.out.println(qresults2.toString());
-        
+        return queryResults;
     }
 }

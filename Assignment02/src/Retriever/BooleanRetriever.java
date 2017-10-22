@@ -25,9 +25,9 @@ public class BooleanRetriever {
     private Indexer idx;
     private static int queryId;
     
-    public BooleanRetriever(Tokenizer tk, Indexer idx){
-        this.tk = tk;
+    public BooleanRetriever(Indexer idx){
         this.idx = idx; 
+        this.tk = idx.getTk();
         queryId = 0;
     }
     
@@ -53,7 +53,7 @@ public class BooleanRetriever {
         if( score == 'a')
         {
             Map<Integer, Long> qresults = (Map<Integer, Long>) Optional.ofNullable(lconcat)
-                .orElseGet(Collections::emptyList).stream().filter(( m )-> m != null)
+                .orElseGet(Collections::emptyList).stream() //.filter(( m )-> m != null)
                 .collect(Collectors.groupingBy(Posting::getDocId, Collectors.counting()));
             
             qresults.entrySet().forEach((entry) -> {

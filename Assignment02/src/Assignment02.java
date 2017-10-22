@@ -39,7 +39,7 @@ public class Assignment02 {
             }
             
             Indexer idx = new Indexer(args[0]);
-            BooleanRetriever br = new BooleanRetriever(idx.getTk(), idx);
+            BooleanRetriever br = new BooleanRetriever(idx);
             
             TreeSet<QueryResult> qresult;
             //cleaning old file

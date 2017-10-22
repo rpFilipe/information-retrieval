@@ -38,13 +38,12 @@ public class Assignment02 {
                 return;
             }
             
-            String outFname= "queryResult_"+score+".txt";
-            
             Indexer idx = new Indexer(args[0]);
             BooleanRetriever br = new BooleanRetriever(idx.getTk(), idx);
             
             TreeSet<QueryResult> qresult;
             //cleaning old file
+            String outFname= "queryResult_"+score+"_"+idx.getTk().getClass().getSimpleName()+".txt";
             FileOutputStream outstream = new FileOutputStream(outFname);
             outstream.close();
             
@@ -67,7 +66,7 @@ public class Assignment02 {
     }
     private static void usage() {
         System.err.println("Usage: <index file> <queries file> <choose score: a or b>");  
-        System.err.println("Example: index.txt cranfield.queries.txt a");
+        System.err.println("Example: index_simple.txt cranfield.queries.txt a");
     }
     
     private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score, boolean firstline){

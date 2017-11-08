@@ -30,7 +30,7 @@ public class Stemmer {
     public String stem(String token){
         Class stemClass;
         try {
-            stemClass = Class.forName("Stemmer.org.tartarus.snowball.ext." + language +"Stemmer");
+            stemClass = Class.forName("org.tartarus.snowball.ext." + language +"Stemmer");
             //System.out.println(stemClass.toString());
             SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
             stemmer.setCurrent(token);

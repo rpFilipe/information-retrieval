@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 
 /**
@@ -64,9 +65,9 @@ public class BooleanRetriever {
         
         else if( score == 'b')
         {
-           Map<Integer, Integer> qresults = (Map<Integer, Integer>) Optional.ofNullable(lconcat)
+           Map<Integer, Double> qresults = (Map<Integer, Double>) Optional.ofNullable(lconcat)
                 .orElseGet(Collections::emptyList).stream()
-                .collect(Collectors.groupingBy(Posting::getDocId, summingInt((Posting::getFrequency))));
+                .collect(Collectors.groupingBy(Posting::getDocId, summingDouble(Posting::getTermWeigth)));
            
            qresults.entrySet().forEach((entry) -> {
                 queryResults.add(new QueryResult(queryId, entry.getKey(), entry.getValue()));

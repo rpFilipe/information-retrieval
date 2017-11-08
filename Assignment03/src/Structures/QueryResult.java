@@ -10,9 +10,9 @@ public class QueryResult implements Comparable{
     
     private int queryId;
     private int docId;
-    private int score;
+    private double score;
 
-    public QueryResult(int queryId, int docId, int score) {
+    public QueryResult(int queryId, int docId, double score) {
         this.queryId = queryId;
         this.docId = docId;
         this.score = score;

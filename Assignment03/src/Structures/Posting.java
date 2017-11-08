@@ -9,34 +9,34 @@ public class Posting implements Comparable{
     
     
     private int docId;
-    private int frequency;
+    private double term_weight;
 
     public Posting(int docId) {
         this.docId = docId;
-        this.frequency = 1;
+        this.term_weight = 0;
     }
     
     public Posting(String s){
         String[] p = s.split(":");
         this.docId = Integer.parseInt(p[0]);
-        this.frequency = Integer.parseInt(p[1]);
+        this.term_weight = Double.parseDouble(p[1]);
     }
 
-    public Posting(int docId, Integer frequency) {
+    public Posting(int docId, double term_weight) {
         this.docId = docId;
-        this.frequency = frequency;
+        this.term_weight = term_weight;
     }
 
     public int getDocId() {
         return docId;
     }
 
-    public int getFrequency() {
-        return frequency;
+    public double getTermWeigth() {
+        return term_weight;
     }
 
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public void setTermWeigth(double term_weight) {
+        this.term_weight = term_weight;
     }
 
     public int compareTo(Object o) {
@@ -54,7 +54,7 @@ public class Posting implements Comparable{
 
     @Override
     public String toString() {
-        return "" + docId + ":" + frequency;
+        return "" + docId + ":" + term_weight;
     }
     
     

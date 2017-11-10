@@ -1,6 +1,5 @@
 package pt.ua.deti.ir.Stemmer;
-
-import Stemmer.org.tartarus.snowball.ext.englishStemmer;
+import org.tartarus.snowball.SnowballStemmer;
 
 
 /**
@@ -28,25 +27,20 @@ public class Stemmer {
      * @return token
      */
     public String stem(String token){
-        /*Class stemClass;
+        Class stemClass;
         try {
-            stemClass = Class.forName("pt.ua.deti.ir.Stemmer.org.tartarus.snowball.ext." + language +"Stemmer");
+            stemClass = Class.forName("org.tartarus.snowball.ext." + language +"Stemmer");
             //System.out.println(stemClass.toString());
             SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
             stemmer.setCurrent(token);
             if (stemmer.stem()){
                 return stemmer.getCurrent();
             }
-                
+                            
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             System.out.println(ex);
-        }*/
+        }   
         
-        englishStemmer stemmer = new englishStemmer();
-        stemmer.setCurrent(token);
-        if (stemmer.stem()){
-            return stemmer.getCurrent();
-        }
         return token;
     } 
 }

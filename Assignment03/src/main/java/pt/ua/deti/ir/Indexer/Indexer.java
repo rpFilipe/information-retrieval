@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import static java.util.Comparator.comparingInt;
@@ -39,10 +38,12 @@ import static java.util.stream.Collectors.toMap;
 public class Indexer {
 
     private HashMap<String, LinkedList<Posting>> map;
-    Tokenizer tk;
+    private Tokenizer tk;
+    private int corpusSize;
 
     public Indexer() {
         this.map = new HashMap<>();
+        this.corpusSize = 0;
     }
     
     public Indexer (String fname) throws FileNotFoundException{
@@ -62,6 +63,7 @@ public class Indexer {
             String swPath = tkData.split(", ")[1];
             String stLanguage = tkData.split(", ")[2];
             int minlength = Integer.parseInt(tkData.split(", ")[3]);
+            this.corpusSize = Integer.parseInt(tkData.split(", ")[4]);
             tk = new ComplexTokenizer(swPath,stLanguage,minlength);
         }
         else if(parsetk.equalsIgnoreCase("simple")){
@@ -88,6 +90,8 @@ public class Indexer {
     }
     
      public void indexTerms(int docId, List tokens) {
+         
+         this.corpusSize++;
         
         Map<String, Long> result = (Map<String, Long>) tokens.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -134,10 +138,12 @@ public class Indexer {
     
     public void indexDoc(int docId, List tokens) {
         
+        this.corpusSize++;
+        
         Map<String, Long> result = (Map<String, Long>) tokens.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         
-        for (Map.Entry<String, Long> entry : result.entrySet()) {
+        result.entrySet().forEach((entry) -> {
             String key = entry.getKey();
             int freq =entry.getValue().intValue();
             
@@ -150,17 +156,20 @@ public class Indexer {
                 map.put(key, postings);
             }
             else{
-               postings.add(new Posting(docId, freq));
-               map.put(key, postings);
+                postings.add(new Posting(docId, freq));
+                map.put(key, postings);
             }
-            
-        }
+        });
         
     }
 
     
     public Tokenizer getTk() {
         return tk;
+    }
+    
+    public void setTokenizer(Tokenizer tk){
+        this.tk = tk;
     }
     
     /**
@@ -191,7 +200,7 @@ public class Indexer {
      * metodo para listar os 10 primeiros termos com maior frequencia em documentos
      * @return list 
      */
-    public List getTermHigherFreq(){;
+    public List getTermHigherFreq(){
         List<String> list = map.entrySet()
                      .stream()
                      .sorted(Map.Entry.comparingByValue(Collections.reverseOrder(comparingInt((list1) -> list1.size())))) //comparingInt(List::size)))
@@ -213,6 +222,8 @@ public class Indexer {
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
             TreeSet<String> orderd_tokens = new TreeSet(map.keySet());
+            
+            output.write(tk.toString() +  ", " + this.corpusSize + "\n");
             
             //String print = 
             for (String s : orderd_tokens) {
@@ -240,5 +251,9 @@ public class Indexer {
         if(map.containsKey(query))
             return map.get(query);
         return null;
+    }
+    
+    public int getCorpusSize(){
+        return this.corpusSize;
     }
 }

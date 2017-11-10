@@ -29,6 +29,10 @@ public class ComplexTokenizer implements Tokenizer{
     private int minTokenLenght;
     private List<String> createdTokens;
     private Pattern pattern;
+    private String stopWordsLocation;
+    private String stemmerLanguge;
+    
+    
     // email regex
     private String regexMail = "^([_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*(\\.[a-zA-Z]{1,6}))?$";
     //private String regexWord = "([\\D])";
@@ -38,6 +42,8 @@ public class ComplexTokenizer implements Tokenizer{
         stp = new Stopwords(stopWords);
         stm = new Stemmer(stemmer);
         this.minTokenLenght = minTokenLenght;
+        this.stopWordsLocation = stopWords;
+        this.stemmerLanguge = stemmer;
         this.pattern = Pattern.compile(regexMail);
     }
     
@@ -136,5 +142,10 @@ public class ComplexTokenizer implements Tokenizer{
         if(s.matches("[a-zA-Z]+"))
             return s;
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "complex, " + this.stopWordsLocation + ", " + stemmerLanguge + ", " + this.minTokenLenght;
     }
 }

@@ -29,10 +29,11 @@ public class RankedRetriever {
 
     public TreeSet<QueryResult> search(String query) {
         
-        double[] scores = new double[1400];   
+        double[] scores = new double[idx.getCorpusSize()];   
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
         int querySize = lquery.size();
+        //System.out.println("query size: " + querySize);
         
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -44,12 +45,17 @@ public class RankedRetriever {
             if((p = idx.getList(entry.getKey())) != null){
                 
                 int tfreq = entry.getValue().intValue();
-                double qweight = (1 + Math.log10(tfreq)) * Math.log10(tfreq/querySize); // Wt,q
+                double qweight = (1 + Math.log10(tfreq)) * Math.log10(querySize/tfreq); // Wt,q
+                
+                //System.out.println("tf: " + (1 + Math.log10(tfreq)));
+                //System.out.println("idf: " + (Math.log10(tfreq/querySize)));
+
+                //System.out.println("qweight: " + qweight);
                 int dft = p.size();
                 
                 p.forEach((posting) -> {
-                    double dweight = posting.getTermWeigth() * Math.log10(dft/1400);
-                    scores[posting.getDocId()] += qweight * dweight;
+                    double dweight = posting.getTermWeigth() * Math.log10(1400/dft);
+                    scores[posting.getDocId()-1] += qweight * dweight;
                 });
             }
         });

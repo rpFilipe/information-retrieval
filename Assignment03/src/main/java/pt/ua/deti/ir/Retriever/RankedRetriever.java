@@ -62,10 +62,12 @@ public class RankedRetriever {
 
         TreeSet<QueryResult> queryResults = new TreeSet();
         
-        int i = 1;
+        int i = -1;
         for (double sc : scores) {
-            queryResults.add(new QueryResult(queryId, i, sc));
             i++;
+            if (sc == 0)
+                continue;
+            queryResults.add(new QueryResult(queryId, i, sc));
         }
 
         return queryResults;

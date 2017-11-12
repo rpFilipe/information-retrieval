@@ -1,15 +1,19 @@
 
 package pt.ua.deti.ir.Retriever;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import pt.ua.deti.ir.Indexer.Indexer;
 import pt.ua.deti.ir.Structures.Posting;
 import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Tokenizer.Tokenizer;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toMap;
 
 /**
  *
@@ -38,7 +42,35 @@ public class RankedRetriever {
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         
-        queryTokens.entrySet().forEach(entry -> {
+        //added
+        Map<String, Double> res = queryTokens.entrySet().stream()
+                .collect(toMap(Entry::getKey, e -> (1 + Math.log10(e.getValue().intValue())) * Math.log10(querySize/e.getValue().intValue())));
+        
+        double qnorm = idx.normalizeDoc(res.values());
+        
+        res = res.entrySet().stream()
+                .collect(toMap(Entry::getKey, e -> e.getValue()/qnorm));
+        
+        res.entrySet().forEach(entry -> {
+           
+            List<Posting> p;
+            
+            if((p = idx.getList(entry.getKey())) != null){
+                
+                double qweight = entry.getValue(); // Wt,q
+
+                //System.out.println("qweight: " + qweight);
+                
+                int dft = p.size();
+                
+                p.forEach((posting) -> {
+                    double dweight = posting.getTermWeigth() * Math.log10(idx.getCorpusSize()/dft);
+                    scores[posting.getDocId()-1] += qweight * dweight;
+                });
+            }
+        });
+        
+        /*queryTokens.entrySet().forEach(entry -> {
            
             List<Posting> p;
             
@@ -51,15 +83,18 @@ public class RankedRetriever {
                 //System.out.println("idf: " + (Math.log10(tfreq/querySize)));
 
                 //System.out.println("qweight: " + qweight);
+                
+                //TODO: falta normalizar a query!!
                 int dft = p.size();
                 
                 p.forEach((posting) -> {
-                    double dweight = posting.getTermWeigth() * Math.log10(1400/dft);
+                    double dweight = posting.getTermWeigth()* Math.log10(1400/dft);
                     scores[posting.getDocId()-1] += qweight * dweight;
                 });
             }
         });
-
+        */
+        
         TreeSet<QueryResult> queryResults = new TreeSet();
         
         int i = -1;
@@ -67,7 +102,7 @@ public class RankedRetriever {
             i++;
             if (sc == 0)
                 continue;
-            queryResults.add(new QueryResult(queryId, i, sc));
+            queryResults.add(new QueryResult(queryId, i, Math.round(sc * 10000.0) / 10000.0));   // round to 4 decimal places
         }
 
         return queryResults;

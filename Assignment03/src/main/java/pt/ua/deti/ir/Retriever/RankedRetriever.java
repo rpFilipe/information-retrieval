@@ -1,8 +1,6 @@
 
 package pt.ua.deti.ir.Retriever;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import pt.ua.deti.ir.Indexer.Indexer;
 import pt.ua.deti.ir.Structures.Posting;
 import pt.ua.deti.ir.Structures.QueryResult;
@@ -43,28 +41,25 @@ public class RankedRetriever {
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         
         //added
-        Map<String, Double> res = queryTokens.entrySet().stream()
-                .collect(toMap(Entry::getKey, e -> (1 + Math.log10(e.getValue().intValue())) * Math.log10(querySize/e.getValue().intValue())));
+       Map<String, Double> res = queryTokens.entrySet().stream()
+               .filter(e -> idx.getList(e.getKey()) != null) 
+               .collect(toMap(Entry::getKey, e -> (      
+                        1 + Math.log10(e.getValue().intValue())) * Math.log10(idx.getCorpusSize()/idx.getList(e.getKey()).size())));  
         
         double qnorm = idx.normalizeDoc(res.values());
         
         res = res.entrySet().stream()
                 .collect(toMap(Entry::getKey, e -> e.getValue()/qnorm));
         
-        res.entrySet().forEach(entry -> {
+        queryTokens.entrySet().forEach(entry -> {
            
             List<Posting> p;
             
             if((p = idx.getList(entry.getKey())) != null){
-                
-                double qweight = entry.getValue(); // Wt,q
 
-                //System.out.println("qweight: " + qweight);
-                
-                int dft = p.size();
-                
                 p.forEach((posting) -> {
-                    double dweight = posting.getTermWeigth() * Math.log10(idx.getCorpusSize()/dft);
+                    double dweight = posting.getTermWeigth();
+                    double qweight = entry.getValue();
                     scores[posting.getDocId()-1] += qweight * dweight;
                 });
             }

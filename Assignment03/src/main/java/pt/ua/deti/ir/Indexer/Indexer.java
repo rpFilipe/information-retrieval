@@ -113,11 +113,11 @@ public class Indexer {
             // First time the term appears
             if(postings == null){
                 postings = new LinkedList();
-                postings.add(new Posting(docId, entry.getValue()));
+                postings.add(new Posting(docId, Math.round(entry.getValue() * 10000.0) / 10000.0));  
                 map.put(key, postings);
             }
             else{
-               postings.add(new Posting(docId, entry.getValue()));
+               postings.add(new Posting(docId,  Math.round(entry.getValue() * 10000.0) / 10000.0));
                map.put(key, postings);
             }
             

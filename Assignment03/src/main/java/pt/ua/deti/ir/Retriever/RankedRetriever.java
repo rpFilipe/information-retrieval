@@ -31,7 +31,7 @@ public class RankedRetriever {
 
     public TreeSet<QueryResult> search(String query) {
         
-        double[] scores = new double[idx.getCorpusSize()];   
+        double[] scores = new double[idx.getCorpusSize()-1];   
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
         int querySize = lquery.size();
@@ -45,11 +45,17 @@ public class RankedRetriever {
                .filter(e -> idx.getList(e.getKey()) != null) 
                .collect(toMap(Entry::getKey, e -> (      
                         1 + Math.log10(e.getValue().intValue())) * Math.log10(idx.getCorpusSize()/idx.getList(e.getKey()).size())));  
-        
+       
+         
+       
         double qnorm = idx.normalizeDoc(res.values());
         
         res = res.entrySet().stream()
                 .collect(toMap(Entry::getKey, e -> e.getValue()/qnorm));
+        
+        print(res);
+        System.exit(0);
+       
         
         queryTokens.entrySet().forEach(entry -> {
            
@@ -92,15 +98,22 @@ public class RankedRetriever {
         
         TreeSet<QueryResult> queryResults = new TreeSet();
         
-        int i = -1;
+        int i = 0;
         for (double sc : scores) {
             i++;
             if (sc == 0)
                 continue;
-            queryResults.add(new QueryResult(queryId, i, Math.round(sc * 10000.0) / 10000.0));   // round to 4 decimal places
+            queryResults.add(new QueryResult(queryId, i, sc));   // round to 4 decimal places
         }
 
         return queryResults;
+    }
+    
+    public void print(Map<String, Double> res){
+        res.entrySet().forEach( entry-> {
+            System.out.println(entry.getKey() + " - " + entry.getValue());
+       
+        });
     }
 
 }

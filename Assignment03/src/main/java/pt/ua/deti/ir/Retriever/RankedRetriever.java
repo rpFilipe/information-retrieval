@@ -31,38 +31,31 @@ public class RankedRetriever {
 
     public TreeSet<QueryResult> search(String query) {
         
-        double[] scores = new double[idx.getCorpusSize()-1];   
+        double[] scores = new double[idx.getCorpusSize()];   
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
-        int querySize = lquery.size();
-        //System.out.println("query size: " + querySize);
-        
+
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         
+        
         //added
-       Map<String, Double> res = queryTokens.entrySet().stream()
-               .filter(e -> idx.getList(e.getKey()) != null) 
+        Map<String, Double> res = queryTokens.entrySet().stream()
+               .filter(e -> idx.getList(e.getKey()) != null)  
                .collect(toMap(Entry::getKey, e -> (      
-                        1 + Math.log10(e.getValue().intValue())) * Math.log10(idx.getCorpusSize()/idx.getList(e.getKey()).size())));  
-       
-         
+                        1 + Math.log10(e.getValue())) * Math.log10((idx.getCorpusSize()/idx.getList(e.getKey()).size()))));    
        
         double qnorm = idx.normalizeDoc(res.values());
-        
+       
         res = res.entrySet().stream()
                 .collect(toMap(Entry::getKey, e -> e.getValue()/qnorm));
         
-        print(res);
-        System.exit(0);
-       
-        
-        queryTokens.entrySet().forEach(entry -> {
+        res.entrySet().forEach(entry -> {
            
             List<Posting> p;
             
             if((p = idx.getList(entry.getKey())) != null){
-
+                
                 p.forEach((posting) -> {
                     double dweight = posting.getTermWeigth();
                     double qweight = entry.getValue();
@@ -70,31 +63,6 @@ public class RankedRetriever {
                 });
             }
         });
-        
-        /*queryTokens.entrySet().forEach(entry -> {
-           
-            List<Posting> p;
-            
-            if((p = idx.getList(entry.getKey())) != null){
-                
-                int tfreq = entry.getValue().intValue();
-                double qweight = (1 + Math.log10(tfreq)) * Math.log10(querySize/tfreq); // Wt,q
-                
-                //System.out.println("tf: " + (1 + Math.log10(tfreq)));
-                //System.out.println("idf: " + (Math.log10(tfreq/querySize)));
-
-                //System.out.println("qweight: " + qweight);
-                
-                //TODO: falta normalizar a query!!
-                int dft = p.size();
-                
-                p.forEach((posting) -> {
-                    double dweight = posting.getTermWeigth()* Math.log10(1400/dft);
-                    scores[posting.getDocId()-1] += qweight * dweight;
-                });
-            }
-        });
-        */
         
         TreeSet<QueryResult> queryResults = new TreeSet();
         

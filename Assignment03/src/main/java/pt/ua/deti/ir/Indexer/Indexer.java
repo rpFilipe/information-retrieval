@@ -92,18 +92,17 @@ public class Indexer {
      public void indexTerms(int docId, List tokens) {
          
          this.corpusSize++;
-        
+
         Map<String, Long> result = (Map<String, Long>) tokens.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        
+
         Map<String, Double> res = result.entrySet().stream()
-                .collect(toMap(Entry::getKey, e -> 1 + Math.log10(e.getValue())));
+                .collect(toMap(Entry::getKey, e -> 1 + Math.log10(e.getValue()))); //idf = 1
         
         double norm = normalizeDoc(res.values());
         
         res = res.entrySet().stream()
                 .collect(toMap(Entry::getKey, e -> e.getValue()/norm));
-        
         
         for (Map.Entry<String, Double> entry : res.entrySet()) {
             String key = entry.getKey();
@@ -129,7 +128,7 @@ public class Indexer {
          
          for (Object object : c) {
              double tmp = (double) object;
-             norm += tmp * tmp;
+             norm += (tmp * tmp);
          }
          
          return Math.sqrt(norm);
@@ -256,4 +255,13 @@ public class Indexer {
     public int getCorpusSize(){
         return this.corpusSize;
     }
+    
+    // for debug
+    public void print(Map<String, Long> res){
+        res.entrySet().forEach( entry-> {
+            System.out.println(entry.getKey() + " - " + entry.getValue());
+       
+        });
+    }
+    
 }

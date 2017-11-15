@@ -11,7 +11,7 @@ public class QueryResult implements Comparable{
     private int queryId;
     private int docId;
     private double score;
-
+    
     public QueryResult(int queryId, int docId, double score) {
         this.queryId = queryId;
         this.docId = docId;

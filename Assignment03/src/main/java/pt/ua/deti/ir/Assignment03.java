@@ -111,6 +111,8 @@ public class Assignment03 {
                     firstline = false;
                 }
                 mh.computeRetrieverMeasures();
+                System.out.println("Query throughput: "+rr.getQueryThroughput());
+                in.close();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {

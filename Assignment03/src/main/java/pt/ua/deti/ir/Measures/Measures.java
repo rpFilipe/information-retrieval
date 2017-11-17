@@ -24,6 +24,7 @@ public class Measures {
     
     //private HashMap<Integer, LinkedList<Posting>> relevanceMap;
     private HashMap<Integer, LinkedList<Integer>> relevanceMap;
+    
     public Measures(String fname) throws FileNotFoundException {
         
         File fileidx = new File(fname);
@@ -93,7 +94,7 @@ public class Measures {
     
     public double fmeasure (double recall, double precision, double beta) {
         
-        return ((Math.pow(beta, 2) + 1)/recall * precision) / (recall + (Math.pow(beta, 2) * precision));
+        return (((Math.pow(beta, 2) + 1) * recall * precision) / (recall + (Math.pow(beta, 2) * precision)));
         
     }
     

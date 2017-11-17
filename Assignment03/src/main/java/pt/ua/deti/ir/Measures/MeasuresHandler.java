@@ -41,14 +41,14 @@ public class MeasuresHandler {
         nqueries++;
         double precision = m.precision(qresult);
         double recall = m.recall(qresult);
-        double f_measure = m.fmeasure(recall, precision, 1);
+        //double f_measure = m.fmeasure(recall, precision, 1.0);
         double precisionAtRank = m.precisionAtRank(qresult, 10);
         double avgprecision = m.averagePrecision(qresult);
         double reciprocalRank = m.reciprocalRank(qresult);
         
         meanPrecision += precision;
         meanRecall += recall;
-        fmeasure += f_measure;
+        //fmeasure += f_measure;
         meanAveragePrecision += avgprecision;
         meanPrecisionAtRank10 += precisionAtRank;
         meanReciprocalRank += reciprocalRank;
@@ -58,7 +58,8 @@ public class MeasuresHandler {
     public void computeRetrieverMeasures(){
         System.out.println("Precision: " + meanPrecision/nqueries);
         System.out.println("Recall: " + meanRecall/nqueries);
-        System.out.println("F-Measure: " + fmeasure/nqueries);
+        //System.out.println("F-Measure: " + fmeasure/nqueries);
+        System.out.println("F-Measure: " + m.fmeasure((meanRecall/nqueries), (meanPrecision/nqueries), 1));
         System.out.println("Precision at rank 10: " + meanPrecisionAtRank10 /nqueries);
         System.out.println("Mean Average Precision: " + meanAveragePrecision/nqueries);
         System.out.println("Mean Reciprocal Rank: " + meanReciprocalRank/nqueries);

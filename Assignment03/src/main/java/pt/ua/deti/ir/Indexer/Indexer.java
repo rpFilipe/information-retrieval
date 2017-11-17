@@ -71,7 +71,7 @@ public class Indexer {
             tk = new SimpleTokenizer(minlength);
         }
         else{
-            System.out.println("ERRO! Tokenizer not recognized!");
+            System.out.println("ERROR! Tokenizer not recognized!");
             System.exit(-1);
         }
 

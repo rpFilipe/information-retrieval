@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+import pt.ua.deti.ir.Measures.MeasuresHandler;
 import pt.ua.deti.ir.Retriever.RankedRetriever;
 import pt.ua.deti.ir.Structures.QueryResult;
 
@@ -85,29 +86,31 @@ public class Assignment03 {
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         } else if (args[0].equalsIgnoreCase("search")) {
             try {
-                
-            File fqueries = new File(args[2]);
-            
-            Indexer idx = new Indexer(args[1]);
-            RankedRetriever rr = new RankedRetriever(idx);
-            
-            TreeSet<QueryResult> qresult;
-            //cleaning old file
-            String outFname= "queryResult_ranked_"+idx.getTk().getClass().getSimpleName()+".txt";
-            FileOutputStream outstream = new FileOutputStream(outFname);
-            outstream.close();
-            
-            Scanner in = new Scanner(fqueries);
-            boolean firstline = true;
-            while(in.hasNextLine()){
-                String line = in.nextLine();
-                qresult = rr.search(line);
-                saveinFile(outFname, qresult, firstline);
-                firstline = false;
-            }
+
+                File fqueries = new File(args[2]);
+                MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
+                Indexer idx = new Indexer(args[1]);
+                RankedRetriever rr = new RankedRetriever(idx);
+
+                TreeSet<QueryResult> qresult;
+                //cleaning old file
+                String outFname = "queryResult_ranked_" + idx.getTk().getClass().getSimpleName() + ".txt";
+                FileOutputStream outstream = new FileOutputStream(outFname);
+                outstream.close();
+
+                Scanner in = new Scanner(fqueries);
+                boolean firstline = true;
+                while (in.hasNextLine()) {
+                    String line = in.nextLine();
+                    qresult = rr.search(line);
+                    mh.computeQueryMeasures(qresult);
+                    saveinFile(outFname, qresult, firstline);
+                    firstline = false;
+                }
+                mh.computeRetrieverMeasures();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -120,21 +123,22 @@ public class Assignment03 {
         //TODO
         for (String arg : args) {
             System.out.println(arg);
-        }    }
-    
-        private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline){
+        }
+    }
+
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline) {
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
-            
+
             String print;
-            if(firstline) {
+            if (firstline) {
                 print = "query_id\tdoc_id\t\tdoc_score_\n";
                 output.write(print);
                 output.flush();
             }
-            for(QueryResult q : qresult){
+            for (QueryResult q : qresult) {
                 print = q.toString();
                 print += "\n";
                 output.write(print);
@@ -146,6 +150,12 @@ public class Assignment03 {
         } catch (IOException ex) {
             Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static void runMeasures(){
+        
+        
+        
     }
 
 }

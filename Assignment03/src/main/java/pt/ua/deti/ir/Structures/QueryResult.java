@@ -18,6 +18,20 @@ public class QueryResult implements Comparable{
         this.score = score;
     }
 
+    public int getQueryId() {
+        return queryId;
+    }
+
+    public int getDocId() {
+        return docId;
+    }
+
+    public double getScore() {
+        return score;
+    }
+    
+    
+
     @Override
     public String toString() {
         return "" + this.queryId + "\t\t" + this.docId + "\t\t" + this.score;

@@ -77,6 +77,17 @@ public class RankedRetriever {
         return queryResults;
     }
     
+    public TreeSet<QueryResult> search(String query, int limit) {
+        
+        TreeSet<QueryResult> result = search(query);
+        
+        result = result.stream()
+                .limit(limit)
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+        
+        return result;
+    } 
+    
     public void print(Map<String, Double> res){
         res.entrySet().forEach( entry-> {
             System.out.println(entry.getKey() + " - " + entry.getValue());

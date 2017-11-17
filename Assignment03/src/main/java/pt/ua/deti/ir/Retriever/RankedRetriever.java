@@ -14,8 +14,10 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 
 /**
+ * Universidade de Aveiro, DETI, Recuperação de Informação
  *
- * @author rpfilipe
+ * @author Joana Conde
+ * @author Ricardo Filipe
  */
 public class RankedRetriever {
 

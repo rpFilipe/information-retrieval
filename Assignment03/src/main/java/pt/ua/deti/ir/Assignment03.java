@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import pt.ua.deti.ir.Measures.MeasuresHandler;
+import pt.ua.deti.ir.Retriever.BooleanRetriever;
 import pt.ua.deti.ir.Retriever.RankedRetriever;
 import pt.ua.deti.ir.Structures.QueryResult;
 
@@ -51,7 +52,7 @@ public class Assignment03 {
                 } else if (args[6].equalsIgnoreCase("simple")) {
                     ctk = new SimpleTokenizer(Integer.parseInt(args[4]));
                 } else {
-                    usage(args);
+                    usage();
                     return;
                 }
 
@@ -111,21 +112,68 @@ public class Assignment03 {
                     firstline = false;
                 }
                 mh.computeRetrieverMeasures();
-                System.out.println("Query throughput: "+rr.getQueryThroughput());
+                System.out.println("Query throughput: "+rr.getQueryThroughput() + "ns");
                 in.close();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }else if(args[0].equalsIgnoreCase("search2")){
+            try {
+            
+            
+            File fqueries = new File(args[2]);
+            char score;
+            if(args[3].equalsIgnoreCase("a") || args[3].equalsIgnoreCase("b"))
+                score = args[3].charAt(0);
+            else{
+                usage();
+                return;
+            }
+            
+            MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
+            Indexer idx = new Indexer(args[1]);
+            BooleanRetriever br = new BooleanRetriever(idx);
+            RankedRetriever rr = new RankedRetriever(idx);
+            
+            TreeSet<QueryResult> qresult;
+            //cleaning old file
+            String outFname= "queryResult_"+score+"_"+idx.getTk().getClass().getSimpleName()+".txt";
+            FileOutputStream outstream = new FileOutputStream(outFname);
+            outstream.close();
+            
+            Scanner in = new Scanner(fqueries);
+            boolean firstline = true;
+            while(in.hasNextLine()){
+                String line = in.nextLine();
+                qresult = br.search(line, score);
+                mh.computeQueryMeasures(qresult);
+                saveinFile(outFname, qresult, score, firstline);
+                firstline = false;
+            }
+            
+            mh.computeRetrieverMeasures();
+            // TODO System.out.println("Query throughput: "+rr.getQueryThroughput() + "ns");
+            in.close();
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        }else{
+            usage();
         }
     }
 
-    private static void usage(String[] args) {
-        //TODO
-        for (String arg : args) {
-            System.out.println(arg);
-        }
+    private static void usage() {
+        System.out.println("Usage:\n"
+                + "index cranfield/ src/main/java/pt/ua/deti/ir/Stopwords/stopwords.txt english 3 index.idx complex\n"
+                + "or\nsearch index.idx cranfield.queries.txt"
+                + "or\nsearch2 index_complex.txt cranfield.queries.txt a\n"
+                + "or\nsearch2 index_complex.txt cranfield.queries.txt b");
     }
 
     private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline) {
@@ -154,10 +202,30 @@ public class Assignment03 {
         }
     }
     
-    private static void runMeasures(){
-        
-        
-        
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score, boolean firstline){
+        try {
+            FileOutputStream outstream = new FileOutputStream(fname, true);
+            Writer output = new OutputStreamWriter(outstream);
+            output = new BufferedWriter(output);
+            
+            String print;
+            if(firstline) {
+                print = "query_id\tdoc_id\t\tdoc_score_"+ score+"\n";
+                output.write(print);
+                output.flush();
+            }
+            for(QueryResult q : qresult){
+                print = q.toString();
+                print += "\n";
+                output.write(print);
+                output.flush();
+            }
+            outstream.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

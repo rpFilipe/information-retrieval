@@ -18,7 +18,9 @@ Any value defined here will override the pom.xml file value but is only applicab
     <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
         <configurations>
             <configuration id="index" profiles=""/>
+            <configuration id="seach2b" profiles=""/>
             <configuration id="search" profiles=""/>
+            <configuration id="search2a" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>

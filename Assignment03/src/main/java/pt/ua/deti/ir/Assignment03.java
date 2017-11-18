@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.Timestamp;
 import pt.ua.deti.ir.CorpusReder.CorpusReader;
 import pt.ua.deti.ir.Indexer.Indexer;
 import pt.ua.deti.ir.Structures.Document;
@@ -60,7 +61,7 @@ public class Assignment03 {
                 System.out.println("Loading stopwords list from " + args[1]);
 
                 // estrutura de dados com os tokens
-                List<String> tokenList = new ArrayList<>();
+                List<String> tokenList;
                 Indexer indx = new Indexer();
                 indx.setTokenizer(ctk);
                 int docId;
@@ -104,66 +105,83 @@ public class Assignment03 {
 
                 Scanner in = new Scanner(fqueries);
                 boolean firstline = true;
+                int queriesPrecessed = 0;
+                Timestamp begin = new Timestamp(System.currentTimeMillis());
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
-                    qresult = rr.search(line);
-                    mh.computeQueryMeasures(qresult);
+                    qresult = rr.search(line, 30);
+                    //mh.computeQueryMeasures(qresult);
                     saveinFile(outFname, qresult, firstline);
                     firstline = false;
+                    queriesPrecessed++;
                 }
-                mh.computeRetrieverMeasures();
-                System.out.println("Query throughput: "+rr.getQueryThroughput() + "ns");
+                //mh.computeRetrieverMeasures();
                 in.close();
+
+                Timestamp end = new Timestamp(System.currentTimeMillis());
+                double delta = end.getTime() - begin.getTime();
+
+                System.out.println("Query Throughput: " + (1 / (delta / queriesPrecessed / 1000)) + " queries per second");
+                System.out.println("Query Latency: " + (delta / queriesPrecessed) + " ms");
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }else if(args[0].equalsIgnoreCase("search2")){
+        } else if (args[0].equalsIgnoreCase("search2")) {
             try {
-            
-            
-            File fqueries = new File(args[2]);
-            char score;
-            if(args[3].equalsIgnoreCase("a") || args[3].equalsIgnoreCase("b"))
-                score = args[3].charAt(0);
-            else{
-                usage();
-                return;
-            }
-            
-            MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
-            Indexer idx = new Indexer(args[1]);
-            BooleanRetriever br = new BooleanRetriever(idx);
-            RankedRetriever rr = new RankedRetriever(idx);
-            
-            TreeSet<QueryResult> qresult;
-            //cleaning old file
-            String outFname= "queryResult_"+score+"_"+idx.getTk().getClass().getSimpleName()+".txt";
-            FileOutputStream outstream = new FileOutputStream(outFname);
-            outstream.close();
-            
-            Scanner in = new Scanner(fqueries);
-            boolean firstline = true;
-            while(in.hasNextLine()){
-                String line = in.nextLine();
-                qresult = br.search(line, score);
-                mh.computeQueryMeasures(qresult);
-                saveinFile(outFname, qresult, score, firstline);
-                firstline = false;
-            }
-            
-            mh.computeRetrieverMeasures();
-            // TODO System.out.println("Query throughput: "+rr.getQueryThroughput() + "ns");
-            in.close();
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
-        }else{
+                File fqueries = new File(args[2]);
+                char score;
+                if (args[3].equalsIgnoreCase("a") || args[3].equalsIgnoreCase("b")) {
+                    score = args[3].charAt(0);
+                } else {
+                    usage();
+                    return;
+                }
+
+                MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
+                Indexer idx = new Indexer(args[1]);
+                BooleanRetriever br = new BooleanRetriever(idx);
+                RankedRetriever rr = new RankedRetriever(idx);
+
+                TreeSet<QueryResult> qresult;
+                
+                //cleaning old file
+                String outFname = "queryResult_" + score + "_" + idx.getTk().getClass().getSimpleName() + ".txt";
+                FileOutputStream outstream = new FileOutputStream(outFname);
+                outstream.close();
+
+                Scanner in = new Scanner(fqueries);
+                boolean firstline = true;
+                int queriesPrecessed = 0;
+                Timestamp begin = new Timestamp(System.currentTimeMillis());
+                while (in.hasNextLine()) {
+                    String line = in.nextLine();
+                    qresult = br.search(line, score);
+                    //mh.computeQueryMeasures(qresult);
+                    //saveinFile(outFname, qresult, score, firstline);
+                    firstline = false;
+                    queriesPrecessed++;
+                }
+
+                //mh.computeRetrieverMeasures();
+                in.close();
+
+                Timestamp end = new Timestamp(System.currentTimeMillis());
+                double delta = end.getTime() - begin.getTime();
+
+                System.out.println("Query Throughput: " + (1 / (delta / queriesPrecessed / 1000)) + " queries per second");
+                System.out.println("Query Latency: " + (delta / queriesPrecessed) + " ms");
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
             usage();
         }
     }
@@ -201,20 +219,20 @@ public class Assignment03 {
             Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score, boolean firstline){
+
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, char score, boolean firstline) {
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
             output = new BufferedWriter(output);
-            
+
             String print;
-            if(firstline) {
-                print = "query_id\tdoc_id\t\tdoc_score_"+ score+"\n";
+            if (firstline) {
+                print = "query_id\tdoc_id\t\tdoc_score_" + score + "\n";
                 output.write(print);
                 output.flush();
             }
-            for(QueryResult q : qresult){
+            for (QueryResult q : qresult) {
                 print = q.toString();
                 print += "\n";
                 output.write(print);

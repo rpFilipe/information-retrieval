@@ -75,4 +75,14 @@ public class BooleanRetriever {
         
         return queryResults;
     }
+    
+    public TreeSet<QueryResult> search(String query, char score, int limit){
+        TreeSet<QueryResult> result = search(query, score);
+        
+        result = result.stream()
+                .limit(limit)
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+        
+        return result;
+    }
 }

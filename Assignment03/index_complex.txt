@@ -1,4 +1,4 @@
-complex, src/Stopwords/stopwords.txt, english, 3
+complex, src/main/java/pt/ua/deti/ir/Stopwords/stopwords.txt, english, 3, 1400
 -0.0904,325:2
 -0.199,479:1
 -1.23849,478:1

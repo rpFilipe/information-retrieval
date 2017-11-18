@@ -24,13 +24,11 @@ public class RankedRetriever {
     private Tokenizer tk;
     private Indexer idx;
     private static int queryId;
-    private static long queryThroughput;
 
     public RankedRetriever(Indexer idx) {
         this.idx = idx;
         this.tk = idx.getTk();
         queryId = 0;
-        queryThroughput = 0;
     }
 
     public TreeSet<QueryResult> search(String query) {
@@ -81,10 +79,6 @@ public class RankedRetriever {
             queryResults.add(new QueryResult(queryId, i, sc));   // round to 4 decimal places
         }
 
-        //long stopTime = System.currentTimeMillis();
-        long stopTime = System.nanoTime();
-        //System.out.println("Stop: "+stopTime);
-        queryThroughput = stopTime - startTime;
         return queryResults;
     }
     
@@ -105,9 +99,4 @@ public class RankedRetriever {
        
         });
     }
-    
-    public long getQueryThroughput(){
-        return queryThroughput/queryId;
-    }
-
 }

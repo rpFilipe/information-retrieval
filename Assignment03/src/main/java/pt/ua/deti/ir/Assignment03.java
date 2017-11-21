@@ -89,7 +89,7 @@ public class Assignment03 {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else if (args[0].equalsIgnoreCase("search")) {
+        } else if (args[0].equalsIgnoreCase("search") && new File("index.idx").exists()) {
             try {
 
                 File fqueries = new File(args[2]);
@@ -109,13 +109,16 @@ public class Assignment03 {
                 Timestamp begin = new Timestamp(System.currentTimeMillis());
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
-                    qresult = rr.search(line, 30);
-                    //mh.computeQueryMeasures(qresult);
+                    if(args.length == 4)
+                        qresult = rr.search(line, Integer.parseInt(args[3]));
+                    else
+                        qresult = rr.search(line);
+                    mh.computeQueryMeasures(qresult);
                     saveinFile(outFname, qresult, firstline);
                     firstline = false;
                     queriesPrecessed++;
                 }
-                //mh.computeRetrieverMeasures();
+                mh.computeRetrieverMeasures();
                 in.close();
 
                 Timestamp end = new Timestamp(System.currentTimeMillis());
@@ -129,7 +132,10 @@ public class Assignment03 {
             } catch (IOException ex) {
                 Logger.getLogger(Assignment03.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else if (args[0].equalsIgnoreCase("search2")) {
+        }else if (args[0].equalsIgnoreCase("search") && !(new File("index.idx").exists())){
+            System.out.println("Please run index first to generate 'index.txt' file!");
+            System.exit(0);
+        }else if (args[0].equalsIgnoreCase("search2")) {
             try {
 
                 File fqueries = new File(args[2]);
@@ -159,14 +165,17 @@ public class Assignment03 {
                 Timestamp begin = new Timestamp(System.currentTimeMillis());
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
-                    qresult = br.search(line, score);
-                    //mh.computeQueryMeasures(qresult);
-                    //saveinFile(outFname, qresult, score, firstline);
+                    if(args.length == 5)
+                        qresult = br.search(line, score, Integer.parseInt(args[4]));
+                    else
+                        qresult = br.search(line, score);
+                    mh.computeQueryMeasures(qresult);
+                    saveinFile(outFname, qresult, score, firstline);
                     firstline = false;
                     queriesPrecessed++;
                 }
 
-                //mh.computeRetrieverMeasures();
+                mh.computeRetrieverMeasures();
                 in.close();
 
                 Timestamp end = new Timestamp(System.currentTimeMillis());
@@ -189,9 +198,9 @@ public class Assignment03 {
     private static void usage() {
         System.out.println("Usage:\n"
                 + "index cranfield/ src/main/java/pt/ua/deti/ir/Stopwords/stopwords.txt english 3 index.idx complex\n"
-                + "or\nsearch index.idx cranfield.queries.txt"
-                + "or\nsearch2 index_complex.txt cranfield.queries.txt a\n"
-                + "or\nsearch2 index_complex.txt cranfield.queries.txt b");
+                + "or\nsearch index.idx cranfield.queries.txt <optional limit>\n"
+                + "or\nsearch2 index_complex.txt cranfield.queries.txt a <optional limit>\n"
+                + "or\nsearch2 index_complex.txt cranfield.queries.txt b <optional limit>");
     }
 
     private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline) {

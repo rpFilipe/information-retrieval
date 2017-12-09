@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
-import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Structures.Relevance;
 import pt.ua.deti.ir.Structures.StringPosting;
 
@@ -22,14 +22,16 @@ public class RocchioFeedBack {
 
     private HashMap<Integer, LinkedList<StringPosting>> docCache;
     private HashMap<Integer, LinkedList<Relevance>> relevanceMap;
-    private final double alpha, beta, theta;
+    private final double ALPHA, BETA, THETA;
+    private final int corpusSize;
 
-    public RocchioFeedBack(String docCache, String relevance, double alpha, double beta, double theta) throws FileNotFoundException {
+    public RocchioFeedBack(String docCache, String relevance, double alpha, double beta, double theta, int corpusSize) throws FileNotFoundException {
         loadDocCache(docCache);
         loadRelevance(relevance);
-        this.alpha = alpha;
-        this.beta = beta;
-        this.theta = theta;
+        this.ALPHA = alpha;
+        this.BETA = beta;
+        this.THETA = theta;
+        this.corpusSize = corpusSize;
     }
 
     private void loadDocCache(String fname) throws FileNotFoundException {
@@ -58,39 +60,55 @@ public class RocchioFeedBack {
         File fileidx = new File(fname);
         Scanner fsc = new Scanner(fileidx);
         this.relevanceMap = new HashMap<>();
-
+        
         String[] line;
         int currentQueryId = 1;
         int queryId, docId, relevance;
-        LinkedList<Relevance> docs;
-
-        while (fsc.hasNext()) {
+        Relevance rl;
+        LinkedList<Relevance> docs = new LinkedList();
+        
+        while(fsc.hasNext()) {
             line = fsc.nextLine().split(" ");
+            
             queryId = Integer.parseInt(line[0]);
             docId = Integer.parseInt(line[1]);
             relevance = Integer.parseInt(line[2]);
+            
+            rl = new Relevance(queryId, docId, relevance);
 
-            if (relevanceMap.containsKey(docId)) {
-                docs = relevanceMap.get(docId);
-                docs.add(new Relevance(queryId, docId, relevance));
-                relevanceMap.put(docId, docs);
-            } else {
-                docs = new LinkedList<>();
-                docs.add(new Relevance(queryId, docId, relevance));
-                relevanceMap.put(docId, docs);
+            if (currentQueryId != queryId){
+                relevanceMap.put(currentQueryId, docs);
+                docs = new LinkedList();
+                docs.add(rl);
+                currentQueryId = queryId;
             }
-        }
+            else{
+                docs.add(rl);
+            }
+        } 
+        
+        relevanceMap.put(currentQueryId, docs);
     }
 
-    public double computeFeedBack(String type, double queryScore, QueryResult qr) {
+    public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector) {
 
+        LinkedList relevantDocs = relevanceMap.get(queryId);
+        if(relevantDocs == null)
+            return queryVector;
+        
+        
+        int dr = relevantDocs.size();
+        int dnr = corpusSize - dr;
+        
         if (type.equalsIgnoreCase("explicit")) {
+            
+            
 
         } // type = implicit
         else {
 
         }
-        return 0;
+        return null;
     }
 
 }

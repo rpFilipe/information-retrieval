@@ -91,37 +91,7 @@ public class Assignment04 {
 
         } else {
 
-            // Gets Path to Text file
-            // TODO: colocar o nosso crandfield_sentences.txt
-            String filePath = new ClassPathResource("cranfield_sentences.txt").getFile().getAbsolutePath();
-
-            log.info("Load & Vectorize Sentences....");
-            // Strip white space before and after for each line
-            SentenceIterator iter = new BasicLineIterator(filePath);
-            // Split on white spaces in the line to get words
-            TokenizerFactory t = new DefaultTokenizerFactory();
-
-            /*
-            CommonPreprocessor will apply the following regex to each token: [\d\.:,"'\(\)\[\]|/?!;]+
-            So, effectively all numbers, punctuation symbols and some special symbols are stripped off.
-            Additionally it forces lower case for all tokens.
-             */
-            t.setTokenPreProcessor(new CommonPreprocessor());
-
-            log.info("Building model....");
-            Word2Vec vec = new Word2Vec.Builder()
-                    .minWordFrequency(5)
-                    .iterations(1)
-                    .layerSize(100)
-                    .seed(42)
-                    .windowSize(5)
-                    .iterate(iter)
-                    .tokenizerFactory(t)
-                    .build();
-
-            log.info("Fitting Word2Vec model....");
-            vec.fit();
-
+            Word2Vec vec = new Word2Vec();
             log.info("Writing word vectors to text file....");
 
             // Prints out the closest 10 words to "day". An example on what to do with these Word Vectors.

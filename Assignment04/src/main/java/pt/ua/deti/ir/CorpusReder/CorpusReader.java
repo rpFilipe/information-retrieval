@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -67,6 +68,13 @@ public class CorpusReader implements Iterator<Object>{
         return null;
     }
     
+    public String[] getSentences(String content) {
+        content = StringUtils.normalizeSpace(content);
+        String[] sentences = content.split("\\s\\.\\s");
+        sentences[sentences.length -1] = sentences[sentences.length-1].split("\\s\\.")[0];
+        return  sentences;
+        }
+
     public int size(){
         return corpusSize;
     }

@@ -38,11 +38,13 @@ import static java.util.stream.Collectors.toMap;
 public class Indexer {
 
     private HashMap<String, LinkedList<Posting>> map;
+    private HashMap<Integer, LinkedList<Posting>> docCache;
     private Tokenizer tk;
     private int corpusSize;
 
     public Indexer() {
         this.map = new HashMap<>();
+        this.docCache = new HashMap<>();
         this.corpusSize = 0;
     }
     

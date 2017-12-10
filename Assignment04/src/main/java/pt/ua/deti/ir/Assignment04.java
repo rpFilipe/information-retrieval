@@ -80,6 +80,7 @@ public class Assignment04 {
                     }
                     saveSentecesInFile("cranfield_sentences.txt", sentences);
                     indx.saveToFile(args[5]);
+                    indx.saveDocCache("docCache.idx");
                     System.out.println("Document Processor finished...");
                 } catch (SAXException ex) {
                     java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);

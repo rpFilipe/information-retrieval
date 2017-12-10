@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
+import pt.ua.deti.ir.Structures.StringPosting;
 
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação 
@@ -38,7 +39,7 @@ import static java.util.stream.Collectors.toMap;
 public class Indexer {
 
     private HashMap<String, LinkedList<Posting>> map;
-    private HashMap<Integer, LinkedList<Posting>> docCache;
+    private HashMap<Integer, LinkedList<StringPosting>> docCache;
     private Tokenizer tk;
     private int corpusSize;
 
@@ -110,16 +111,27 @@ public class Indexer {
             String key = entry.getKey();
              
             LinkedList postings = map.get(key);
+            LinkedList strPos = docCache.get(docId);
             
             // First time the term appears
             if(postings == null){
                 postings = new LinkedList();
                 postings.add(new Posting(docId, entry.getValue()));  
                 map.put(key, postings);
-            }
-            else{
+            }else{
                postings.add(new Posting(docId, entry.getValue()));
                map.put(key, postings);
+            }
+            
+            // creating docCache
+            if(strPos == null){
+                strPos = new LinkedList();
+                strPos.add(new StringPosting(key, entry.getValue()));
+                docCache.put(docId, strPos);
+            }
+            else{
+               strPos.add(new StringPosting(key, entry.getValue()));
+               docCache.put(docId, strPos);
             }
             
         }
@@ -232,6 +244,43 @@ public class Indexer {
                 LinkedList<Posting> tmp = map.get(s);
                 print = print + s;
                 for (Posting p : tmp) {
+                    print = print +"," + p;
+                }
+                print += "\n";
+                output.write(print);
+                output.flush();
+            }
+            
+            output.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    /**
+     * metodo que grava o document cache para o ficheiro passado como argumento
+     * @param filename 
+     */
+    public void saveDocCache(String filename) {
+        OutputStream outstream;      
+        
+        try {
+            outstream = new FileOutputStream(filename);
+            Writer output = new OutputStreamWriter(outstream);
+            output = new BufferedWriter(output);
+            TreeSet<Integer> orderd_tokens = new TreeSet(docCache.keySet());
+            
+            //output.write(tk.toString() +  ", " + this.corpusSize + "\n");
+            
+            //String print = 
+            for (int s : orderd_tokens) {
+                String print = "";
+                LinkedList<StringPosting> tmp = docCache.get(s);
+                print = print + s;
+                for (StringPosting p : tmp) {
                     print = print +"," + p;
                 }
                 print += "\n";

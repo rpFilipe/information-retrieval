@@ -39,14 +39,14 @@ public class RankedRetriever {
 
     public RankedRetriever(Indexer idx, String sentences) throws FileNotFoundException {
         this.idx = idx;
-        this.rfb = new RocchioFeedBack("", "", 1, 0.8, 0.1, idx.getCorpusSize());
+        this.rfb = new RocchioFeedBack("docCache.idx", "crandfield.query.relevance.txt", 1.0, 1.0, 0.25, idx.getCorpusSize());
         this.tk = idx.getTk();
         trainModel(sentences);
         queryId = 0;
         nSimilar = 3;
     }
 
-    public TreeSet<QueryResult> search(String query) {
+    public TreeSet<QueryResult> search(String query, String type) {
 
         double[] scores = new double[idx.getCorpusSize()];
         queryId++;
@@ -67,7 +67,7 @@ public class RankedRetriever {
                 .collect(toMap(Entry::getKey, e -> e.getValue() / qnorm));
 
         //TODO rocchio feedback
-        
+        Map<String,Double> queryVector = res;
         
         res.entrySet().forEach(entry -> {
 
@@ -91,15 +91,22 @@ public class RankedRetriever {
             if (sc == 0) {
                 continue;
             }
-            queryResults.add(new QueryResult(queryId, i, sc));   // round to 4 decimal places
+            queryResults.add(new QueryResult(queryId, i, sc));   
         }
+        
+        TreeSet<QueryResult> retireveDocs = queryResults.stream()
+                .limit(10)
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+        
+        //TODO rocchio feedback
+        rfb.computeFeedBack(type, queryId, queryVector, retireveDocs);
 
         return queryResults;
     }
 
-    public TreeSet<QueryResult> search(String query, int limit) {
+    public TreeSet<QueryResult> search(String query, String type, int limit) {
 
-        TreeSet<QueryResult> result = search(query);
+        TreeSet<QueryResult> result = search(query, type);
 
         result = result.stream()
                 .limit(limit)

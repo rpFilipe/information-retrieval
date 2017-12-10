@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeSet;
+import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Structures.Relevance;
 import pt.ua.deti.ir.Structures.StringPosting;
 
@@ -53,6 +56,11 @@ public class RocchioFeedBack {
         }
     }
 
+    /**
+     * Metodo para carregar o gold standart relevance
+     * @param fname
+     * @throws FileNotFoundException 
+     */
     private void loadRelevance(String fname) throws FileNotFoundException {
         File fileidx = new File(fname);
         Scanner fsc = new Scanner(fileidx);
@@ -87,15 +95,17 @@ public class RocchioFeedBack {
         relevanceMap.put(currentQueryId, docs);
     }
 
-    public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector) {
+    public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retireveDocs) {
 
         LinkedList relevantDocs = relevanceMap.get(queryId);
         if(relevantDocs == null)
             return queryVector;
+      
+        
+        //int dr = relevantDocs.size();
+        //int dnr = corpusSize - dr;
         
         
-        int dr = relevantDocs.size();
-        int dnr = corpusSize - dr;
         
         if (type.equalsIgnoreCase("explicit")) {
             

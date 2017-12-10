@@ -1,6 +1,7 @@
 package pt.ua.deti.ir;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import org.datavec.api.util.ClassPathResource;
@@ -24,9 +27,12 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import pt.ua.deti.ir.CorpusReder.CorpusReader;
 import pt.ua.deti.ir.Indexer.Indexer;
+import pt.ua.deti.ir.Retriever.RankedRetriever;
 import pt.ua.deti.ir.Structures.Document;
+import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Tokenizer.ComplexTokenizer;
 import pt.ua.deti.ir.Tokenizer.Tokenizer;
+import pt.ua.ir.deti.FeedBack.RocchioFeedBack;
 
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação
@@ -90,8 +96,21 @@ public class Assignment04 {
                 java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else {
-
+        } else if(args[0].equalsIgnoreCase("query_expansion") && !(new File("crandfield_sentences.txt").exists())){
+            System.out.println("Please run index first to generate 'index.txt' and 'crandfield_sentences.txt' files!");
+            System.exit(0);
+        } else if(args[0].equalsIgnoreCase("query_expansion")&& new File("crandfield_sentences.txt").exists()){
+            
+            //Rocchio feedback
+            Indexer idx = new Indexer(args[1]);
+            RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
+            
+                      
+            
+            
+            
+            //Query expansion
+            
             Word2Vec vec = new Word2Vec();
             log.info("Writing word vectors to text file....");
 

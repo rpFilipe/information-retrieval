@@ -102,7 +102,7 @@ public class RocchioFeedBack {
     }
 
     public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retrieveDocs) {
-
+        
         LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);
         if (relevantDocs == null) {
             return queryVector;
@@ -119,6 +119,7 @@ public class RocchioFeedBack {
 
             // relevant docs
             TreeSet<QueryResult> dr = new TreeSet<>();
+            TreeSet<QueryResult> dnr = new TreeSet<>();
             /*TreeSet<QueryResult> dr = retrieveDocs.stream()
                     .filter(e -> relevantDocs.contains(new Relevance(queryId,e.getDocId())))
                     .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
@@ -129,6 +130,8 @@ public class RocchioFeedBack {
                     if(e.getDocId() == entry.getDocId() && e.getQueryId() == entry.getQueryId()){
                         System.out.println(entry.getDocId());
                         dr.add(entry);
+                    }else{
+                        //dnr.add(entry);
                     }
                 });
             });
@@ -155,7 +158,7 @@ public class RocchioFeedBack {
             }
             
             // non relevant docs
-            TreeSet<QueryResult> dnr = retrieveDocs.stream()
+           dnr = retrieveDocs.stream()
                     .filter(e -> !relevantDocs.contains(e.getDocId()))
                     .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
 

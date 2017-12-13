@@ -102,14 +102,14 @@ public class Assignment04 {
             //Rocchio feedback
             Indexer idx = new Indexer(args[1]);
             RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
-            Map<String,Double> qresult;
+            TreeSet<QueryResult> qresult;
             File fqueries = new File("cranfield.queries.txt");
             Scanner in = new Scanner(fqueries);
 
             while (in.hasNextLine()) {
                 String line = in.nextLine();
                 qresult = rr.search(line, "explicit");
-
+                break;
             }
             in.close();
             

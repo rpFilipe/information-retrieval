@@ -1,7 +1,10 @@
 package pt.ua.deti.ir.Retriever;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import pt.ua.deti.ir.Indexer.Indexer;
 import pt.ua.deti.ir.Structures.Posting;
 import pt.ua.deti.ir.Structures.QueryResult;
@@ -46,14 +49,19 @@ public class RankedRetriever {
         nSimilar = 3;
     }
 
-    public Map<String,Double> search(String query, String type) {
+    public TreeSet<QueryResult> search(String query, String type) {
 
         double[] scores = new double[idx.getCorpusSize()];
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
         
-        //TODO da erro
-        //lquery = expandQuery(lquery);
+        List<String> raw_query = Arrays.asList(query.split(" "));
+        raw_query = expandQuery(raw_query);
+       
+        query = "";
+        for(String s : raw_query)
+            query = query + " " + s;
+
 
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -70,12 +78,14 @@ public class RankedRetriever {
         //TODO rocchio feedback
         Map<String,Double> queryVector = res;
         
+        System.out.println("res: "+res.toString());
+        
         res.entrySet().forEach(entry -> {
 
             List<Posting> p;
 
             if ((p = idx.getList(entry.getKey())) != null) {
-
+                System.out.println("p: "+p.toString());
                 p.forEach((posting) -> {
                     double dweight = posting.getTermWeigth();
                     double qweight = entry.getValue();
@@ -100,9 +110,34 @@ public class RankedRetriever {
                 .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
         
         //TODO rocchio feedback
-        Map<String, Double> resultsQ = rfb.computeFeedBack(type, queryId, queryVector, retireveDocs);
+        /*Map<String, Double> modifiedQ = rfb.computeFeedBack(type, queryId, queryVector, retireveDocs);
 
-        return resultsQ;
+        modifiedQ.entrySet().forEach(entry -> {
+
+            List<Posting> p;
+
+            if ((p = idx.getList(entry.getKey())) != null) {
+
+                p.forEach((posting) -> {
+                    double dweight = posting.getTermWeigth();
+                    double qweight = entry.getValue();
+                    scores[posting.getDocId() - 1] += qweight * dweight;
+                });
+            }
+        });
+        
+        queryResults = new TreeSet();
+        double[] finalScores = new double[idx.getCorpusSize()];
+        i = 0;
+        for (double sc : finalScores) {
+            i++;
+            if (sc == 0) {
+                continue;
+            }
+            queryResults.add(new QueryResult(queryId, i, sc));   
+        }
+        */
+        return queryResults;
     }
 
     /*public TreeSet<QueryResult> search(String query, String type, int limit) {
@@ -153,14 +188,18 @@ public class RankedRetriever {
     }
     
     private List<String> expandQuery(List<String> query){
-        List<String> expandedQuery = query;
-        Collection<String> lst;
-        
-        for(String term : query){
-             lst = vec.wordsNearest(term, nSimilar);
-             expandedQuery.addAll(lst);
+            List<String> expandedQuery = new LinkedList();
+            List<String> lst;
+
+            for(String term : query){
+                lst = new ArrayList(vec.wordsNearest("light", nSimilar));
+                System.out.println(lst);
+                expandedQuery.addAll(lst);
+            }
+
+            // add initial elements
+            expandedQuery.addAll(query);
+
+            return expandedQuery;
         }
-        
-        return expandedQuery;
-    }
 }

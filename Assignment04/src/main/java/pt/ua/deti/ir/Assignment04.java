@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -96,16 +97,21 @@ public class Assignment04 {
                 java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else if(args[0].equalsIgnoreCase("query_expansion") && !(new File("crandfield_sentences.txt").exists())){
-            System.out.println("Please run index first to generate 'index.txt' and 'crandfield_sentences.txt' files!");
-            System.exit(0);
-        } else if(args[0].equalsIgnoreCase("query_expansion")&& new File("crandfield_sentences.txt").exists()){
+        } else if(args[0].equalsIgnoreCase("query_expansion")){
             
             //Rocchio feedback
             Indexer idx = new Indexer(args[1]);
             RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
-            
-                      
+            Map<String,Double> qresult;
+            File fqueries = new File("cranfield.queries.txt");
+            Scanner in = new Scanner(fqueries);
+
+            while (in.hasNextLine()) {
+                String line = in.nextLine();
+                qresult = rr.search(line, "explicit");
+
+            }
+            in.close();
             
             
             

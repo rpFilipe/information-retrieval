@@ -2,13 +2,17 @@ package pt.ua.ir.deti.FeedBack;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.toMap;
 import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Structures.Relevance;
@@ -97,27 +101,94 @@ public class RocchioFeedBack {
         relevanceMap.put(currentQueryId, docs);
     }
 
-    public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retriveDocs) {
+    public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retrieveDocs) {
 
-        LinkedList relevantDocs = relevanceMap.get(queryId);
+        LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);
         if (relevantDocs == null) {
             return queryVector;
         }
 
+        //debug
+        //System.out.println("relevantDocs: "+ relevantDocs.toString());
+        //System.out.println("retriveDocs: "+ retriveDocs.toString());  
+        
         //int dr = relevantDocs.size();
         //int dnr = corpusSize - dr;
         
-
         if (type.equalsIgnoreCase("explicit")) {
 
-            TreeSet<QueryResult> dr = retriveDocs.stream()
-                    .filter(e -> relevantDocs.contains(e.getDocId()))
+            // relevant docs
+            TreeSet<QueryResult> dr = new TreeSet<>();
+            /*TreeSet<QueryResult> dr = retrieveDocs.stream()
+                    .filter(e -> relevantDocs.contains(new Relevance(queryId,e.getDocId())))
                     .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+            */
+            
+            retrieveDocs.forEach(entry -> {
+                relevantDocs.forEach( e ->{
+                    if(e.getDocId() == entry.getDocId() && e.getQueryId() == entry.getQueryId()){
+                        System.out.println(entry.getDocId());
+                        dr.add(entry);
+                    }
+                });
+            });
+            
+            System.out.println("dr: " + dr.toString());
+            
+            Map<String, Double> sumWtDR = null;
+            
+            dr.forEach( entry -> {
+                List<StringPosting> strPos = docCache.get(entry.getDocId());
+                
+                Map<String, Double> tmp = (Map<String, Double>) Optional.ofNullable(strPos)
+                .orElseGet(Collections::emptyList).stream()
+                .collect(Collectors.groupingBy(StringPosting::getTerm, summingDouble(StringPosting::getTermWeigth)));
+                
+                tmp.forEach(sumWtDR::putIfAbsent);
 
-            TreeSet<QueryResult> dnr = retriveDocs.stream()
+            } );
+            
+            if(sumWtDR != null){
+                Map<String, Double> resultDR = sumWtDR.entrySet().stream()
+                    .filter(m -> m.getValue() != null)
+                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * BETA));
+            }
+            
+            // non relevant docs
+            TreeSet<QueryResult> dnr = retrieveDocs.stream()
                     .filter(e -> !relevantDocs.contains(e.getDocId()))
                     .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
 
+            System.out.println("dnr: " + dnr.toString());
+            
+            Map<String, Double> sumWtDNR = null;
+            
+            dnr.forEach( entry -> {
+                List<StringPosting> strPos = docCache.get(entry.getDocId());
+                
+                Map<String, Double> tmp = (Map<String, Double>) Optional.ofNullable(strPos)
+                .orElseGet(Collections::emptyList).stream()
+                .collect(Collectors.groupingBy(StringPosting::getTerm, summingDouble(StringPosting::getTermWeigth)));
+                
+                tmp.forEach(sumWtDNR::putIfAbsent);
+
+            } );
+            
+            if(sumWtDNR != null){
+                Map<String, Double> resultDNR = sumWtDNR.entrySet().stream()
+                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * THETA));
+            }
+            
+            
+            //query
+            Map<String, Double> resultQ = queryVector.entrySet().stream()
+                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * ALPHA));
+            
+            
+            /*resultQ.forEach( (k,v) -> {
+                double drWt = resultDR.get(k);
+                double
+            });*/
             
         } // type = implicit
         else {

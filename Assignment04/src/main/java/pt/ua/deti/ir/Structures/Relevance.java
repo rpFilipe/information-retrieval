@@ -1,6 +1,8 @@
 
 package pt.ua.deti.ir.Structures;
 
+import lombok.ToString;
+
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação 
  * @author Joana Conde 
@@ -16,6 +18,11 @@ public class Relevance {
         this.relevance = relevance;
     }
 
+    public Relevance(int queryId, int docId) {
+        this.queryId = queryId;
+        this.docId = docId;
+    }
+
     public int getQueryId() {
         return queryId;
     }
@@ -28,6 +35,9 @@ public class Relevance {
         return relevance;
     }
     
-    
+    @Override
+    public String toString(){
+        return queryId + " " + docId + " " + relevance;
+    }
     
 }

@@ -49,19 +49,20 @@ public class RankedRetriever {
         nSimilar = 3;
     }
 
-    public TreeSet<QueryResult> search(String query, String type) {
+    public TreeSet<QueryResult> search(String query, String type, boolean feedback) {
 
         double[] scores = new double[idx.getCorpusSize()];
+        double[] scoreWfeedback = new double[idx.getCorpusSize()];
         queryId++;
         List<String> lquery = tk.contentProcessor(query);
-        
+
         List<String> raw_query = Arrays.asList(query.split(" "));
         raw_query = expandQuery(raw_query);
-       
-        query = "";
-        for(String s : raw_query)
-            query = query + " " + s;
 
+        query = "";
+        for (String s : raw_query) {
+            query = query + " " + s;
+        }
 
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -76,16 +77,15 @@ public class RankedRetriever {
                 .collect(toMap(Entry::getKey, e -> e.getValue() / qnorm));
 
         //TODO rocchio feedback
-        Map<String,Double> queryVector = res;
-        
-        System.out.println("res: "+res.toString());
-        
+        Map<String, Double> queryVector = res;
+
+        System.out.println("res: " + res.toString());
+
         res.entrySet().forEach(entry -> {
 
             List<Posting> p;
 
             if ((p = idx.getList(entry.getKey())) != null) {
-                System.out.println("p: "+p.toString());
                 p.forEach((posting) -> {
                     double dweight = posting.getTermWeigth();
                     double qweight = entry.getValue();
@@ -102,54 +102,40 @@ public class RankedRetriever {
             if (sc == 0) {
                 continue;
             }
-            queryResults.add(new QueryResult(queryId, i, sc));   
+            queryResults.add(new QueryResult(queryId, i, sc));
         }
-        
-        TreeSet<QueryResult> retireveDocs = queryResults.stream()
-                .limit(10)
-                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
-        
-        //TODO rocchio feedback
-        /*Map<String, Double> modifiedQ = rfb.computeFeedBack(type, queryId, queryVector, retireveDocs);
 
-        modifiedQ.entrySet().forEach(entry -> {
+        if (feedback) {
+            queryVector = rfb.computeFeedBack(type, queryId, queryVector, queryResults);
 
-            List<Posting> p;
+            queryVector.entrySet().forEach(entry -> {
 
-            if ((p = idx.getList(entry.getKey())) != null) {
+                List<Posting> p;
 
-                p.forEach((posting) -> {
-                    double dweight = posting.getTermWeigth();
-                    double qweight = entry.getValue();
-                    scores[posting.getDocId() - 1] += qweight * dweight;
-                });
+                if ((p = idx.getList(entry.getKey())) != null) {
+                    System.out.println("p: " + p.toString());
+                    p.forEach((posting) -> {
+                        double dweight = posting.getTermWeigth();
+                        double qweight = entry.getValue();
+                        scores[posting.getDocId() - 1] += qweight * dweight;
+                    });
+                }
+            });
+
+            queryResults = new TreeSet();
+
+            i = 0;
+            for (double sc : scoreWfeedback) {
+                i++;
+                if (sc == 0) {
+                    continue;
+                }
+                queryResults.add(new QueryResult(queryId, i, sc));
             }
-        });
-        
-        queryResults = new TreeSet();
-        double[] finalScores = new double[idx.getCorpusSize()];
-        i = 0;
-        for (double sc : finalScores) {
-            i++;
-            if (sc == 0) {
-                continue;
-            }
-            queryResults.add(new QueryResult(queryId, i, sc));   
         }
-        */
+
         return queryResults;
     }
-
-    /*public TreeSet<QueryResult> search(String query, String type, int limit) {
-
-        TreeSet<QueryResult> result = search(query, type);
-
-        result = result.stream()
-                .limit(limit)
-                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
-
-        return result;
-    }*/
 
     public void print(Map<String, Double> res) {
         res.entrySet().forEach(entry -> {
@@ -186,20 +172,20 @@ public class RankedRetriever {
                 .build();
         vec.fit();
     }
-    
-    private List<String> expandQuery(List<String> query){
-            List<String> expandedQuery = new LinkedList();
-            List<String> lst;
 
-            for(String term : query){
-                lst = new ArrayList(vec.wordsNearest("light", nSimilar));
-                System.out.println(lst);
-                expandedQuery.addAll(lst);
-            }
+    private List<String> expandQuery(List<String> query) {
+        List<String> expandedQuery = new LinkedList();
+        List<String> lst;
 
-            // add initial elements
-            expandedQuery.addAll(query);
-
-            return expandedQuery;
+        for (String term : query) {
+            lst = new ArrayList(vec.wordsNearest("light", nSimilar));
+            System.out.println(lst);
+            expandedQuery.addAll(lst);
         }
+
+        // add initial elements
+        expandedQuery.addAll(query);
+
+        return expandedQuery;
+    }
 }

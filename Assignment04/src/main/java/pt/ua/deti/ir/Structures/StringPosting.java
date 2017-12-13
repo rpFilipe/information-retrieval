@@ -1,21 +1,25 @@
-
 package pt.ua.deti.ir.Structures;
 
 /**
- * Universidade de Aveiro, DETI, Recuperação de Informação 
- * @author Joana Conde 
+ * Universidade de Aveiro, DETI, Recuperação de Informação
+ *
+ * @author Joana Conde
  * @author Ricardo Filipe
  */
-public class StringPosting implements Comparable{
-    
-    
+public class StringPosting implements Comparable {
+
     private String term;
     private double term_weight;
-    
-    public StringPosting(String s){
-        String[] p = s.split(":");
-        this.term = p[0];
-        this.term_weight = Double.parseDouble(p[1]);
+
+    public StringPosting(String s) {
+        if (s.contains(":")) {
+            String[] p = s.split(":");
+            this.term = p[0];
+            this.term_weight = Double.parseDouble(p[1]);
+        }
+        else {
+            this.term = s;
+        }
     }
 
     public StringPosting(String term, double term_weight) {
@@ -47,6 +51,5 @@ public class StringPosting implements Comparable{
     public String toString() {
         return "" + term + ":" + term_weight;
     }
-    
-    
+
 }

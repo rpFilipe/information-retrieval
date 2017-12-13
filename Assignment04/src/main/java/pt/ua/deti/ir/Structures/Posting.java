@@ -39,6 +39,7 @@ public class Posting implements Comparable{
         this.term_weight = term_weight;
     }
 
+    @Override
     public int compareTo(Object o) {
 
         Posting p = (Posting) o;

@@ -1,8 +1,6 @@
 
 package pt.ua.deti.ir.Structures;
 
-import lombok.ToString;
-
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação 
  * @author Joana Conde 

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -97,33 +98,35 @@ public class Assignment04 {
                 java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else if(args[0].equalsIgnoreCase("query_expansion")){
-            
-            //Rocchio feedback
+        } else if (args[0].equalsIgnoreCase("query_expansion")) {
+
             Indexer idx = new Indexer(args[1]);
             RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
             TreeSet<QueryResult> qresult;
             File fqueries = new File("cranfield.queries.txt");
             Scanner in = new Scanner(fqueries);
 
+            String outFname = "queryResult_ranked_" + idx.getTk().getClass().getSimpleName() + ".txt";
+            FileOutputStream outstream = new FileOutputStream(outFname);
+            outstream.close();
+
+            boolean firstline = true;
+            int queriesPrecessed = 0;
+            Timestamp begin = new Timestamp(System.currentTimeMillis());
+
             while (in.hasNextLine()) {
                 String line = in.nextLine();
-                qresult = rr.search(line, "explicit");
+                qresult = rr.search(line, "explicit", true);
+                saveinFile(outFname, qresult, firstline);
+                firstline = false;
                 break;
             }
             in.close();
-            
-            
-            
-            //Query expansion
-            
-            Word2Vec vec = new Word2Vec();
-            log.info("Writing word vectors to text file....");
+            Timestamp end = new Timestamp(System.currentTimeMillis());
+            double delta = end.getTime() - begin.getTime();
 
-            // Prints out the closest 10 words to "day". An example on what to do with these Word Vectors.
-            log.info("Closest Words:");
-            Collection<String> lst = vec.wordsNearest("day", 10);
-            System.out.println("10 Words closest to 'day': " + lst);
+            System.out.println("Query Throughput: " + (1 / (delta / queriesPrecessed / 1000)) + " queries per second");
+            System.out.println("Query Latency: " + (delta / queriesPrecessed) + " ms");
         }
 
     }
@@ -146,18 +149,44 @@ public class Assignment04 {
 
             sentences.forEach(snt -> {
                 try {
-                    bufWriter.write(snt+"\n");
+                    bufWriter.write(snt + "\n");
                 } catch (IOException ex) {
                     java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
-            
+
             System.err.println("Sentence savev in " + fname);
 
         } catch (FileNotFoundException ex) {
             java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline) {
+        try {
+            FileOutputStream outstream = new FileOutputStream(fname, true);
+            Writer output = new OutputStreamWriter(outstream);
+            output = new BufferedWriter(output);
+
+            String print;
+            if (firstline) {
+                print = "query_id\tdoc_id\t\tdoc_score_\n";
+                output.write(print);
+                output.flush();
+            }
+            for (QueryResult q : qresult) {
+                print = q.toString();
+                print += "\n";
+                output.write(print);
+                output.flush();
+            }
+            outstream.close();
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

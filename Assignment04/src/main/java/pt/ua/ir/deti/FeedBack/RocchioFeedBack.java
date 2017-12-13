@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.summingDouble;
+import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.stream.Collectors.toMap;
 import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Structures.Relevance;
@@ -26,7 +28,7 @@ import pt.ua.deti.ir.Structures.StringPosting;
  */
 public class RocchioFeedBack {
 
-    private HashMap<Integer, LinkedList<StringPosting>> docCache;
+    private HashMap<Integer, TreeSet<StringPosting>> docCache;
     private HashMap<Integer, LinkedList<Relevance>> relevanceMap;
     private final double ALPHA, BETA, THETA;
     private final int corpusSize;
@@ -48,13 +50,13 @@ public class RocchioFeedBack {
         String line;
         String[] terms;
         int docId;
-        LinkedList<StringPosting> l;
+        TreeSet<StringPosting> l;
 
         while (fsc.hasNextLine()) {
             line = fsc.nextLine();
             terms = line.split(",");
             docId = Integer.parseInt(terms[0]);
-            l = new LinkedList<>();
+            l = new TreeSet<>();
             for (int i = 1; i < terms.length; i++) {
                 l.add(new StringPosting(terms[i]));
             }
@@ -102,102 +104,78 @@ public class RocchioFeedBack {
     }
 
     public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retrieveDocs) {
-        
-        LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);
-        if (relevantDocs == null) {
-            return queryVector;
-        }
 
-        //debug
-        //System.out.println("relevantDocs: "+ relevantDocs.toString());
-        //System.out.println("retriveDocs: "+ retriveDocs.toString());  
-        
-        //int dr = relevantDocs.size();
-        //int dnr = corpusSize - dr;
-        
+        // relevant docs
+        Map<String, Double> modifiedVector = null;
+        Set<Integer> dr;
+        Set<Integer> dnr;
+        Set<String> queryTerms = queryVector.keySet();
+        double[] positiveFeedbackVector = new double[queryTerms.size()];
+        double[] negativeFeedbackBector = new double[queryTerms.size()];
+
         if (type.equalsIgnoreCase("explicit")) {
 
-            // relevant docs
-            TreeSet<QueryResult> dr = new TreeSet<>();
-            TreeSet<QueryResult> dnr = new TreeSet<>();
-            /*TreeSet<QueryResult> dr = retrieveDocs.stream()
-                    .filter(e -> relevantDocs.contains(new Relevance(queryId,e.getDocId())))
-                    .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
-            */
-            
-            retrieveDocs.forEach(entry -> {
-                relevantDocs.forEach( e ->{
-                    if(e.getDocId() == entry.getDocId() && e.getQueryId() == entry.getQueryId()){
-                        System.out.println(entry.getDocId());
-                        dr.add(entry);
-                    }else{
-                        //dnr.add(entry);
+            LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);
+            if (relevantDocs == null) {
+                return queryVector;
+            }
+
+            // Helper to get the relevant docIDs to the query
+            List<Integer> relDocsId = relevantDocs.stream()
+                    .map(doc -> doc.getDocId())
+                    .collect(Collectors.toList());
+
+            dr = retrieveDocs.stream()
+                    .filter(doc -> relDocsId.contains(doc.getDocId()))
+                    .map(doc -> doc.getDocId())
+                    .collect(Collectors.toSet());
+
+            dnr = retrieveDocs.stream()
+                    .filter(doc -> !relDocsId.contains(doc.getDocId()))
+                    .map(doc -> doc.getDocId())
+                    .collect(Collectors.toSet());
+
+            TreeSet<StringPosting> postings;
+            StringPosting sp, tmp;
+            // iterating over all terms in query
+            for (String term : queryTerms) {
+                System.out.println(term);
+                int i = 0;
+                for (int docId : dr) {
+                    postings = docCache.get(docId);
+                    tmp = new StringPosting(term);
+                    if (postings.contains(tmp)) {
+                        sp = postings.headSet(tmp, true).first();
+                        positiveFeedbackVector[i] += sp.getTermWeigth();
                     }
-                });
-            });
-            
-            System.out.println("dr: " + dr.toString());
-            
-            Map<String, Double> sumWtDR = null;
-            
-            dr.forEach( entry -> {
-                List<StringPosting> strPos = docCache.get(entry.getDocId());
-                
-                Map<String, Double> tmp = (Map<String, Double>) Optional.ofNullable(strPos)
-                .orElseGet(Collections::emptyList).stream()
-                .collect(Collectors.groupingBy(StringPosting::getTerm, summingDouble(StringPosting::getTermWeigth)));
-                
-                tmp.forEach(sumWtDR::putIfAbsent);
+                }
 
-            } );
-            
-            if(sumWtDR != null){
-                Map<String, Double> resultDR = sumWtDR.entrySet().stream()
-                    .filter(m -> m.getValue() != null)
-                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * BETA));
+                for (int docId : dnr) {
+                    postings = docCache.get(docId);
+                    tmp = new StringPosting(term);
+                    if (postings.contains(tmp)) {
+                        sp = postings.headSet(tmp, true).first();
+                        negativeFeedbackBector[i] += sp.getTermWeigth();
+                    }
+                }
+                i++;
             }
-            
-            // non relevant docs
-           dnr = retrieveDocs.stream()
-                    .filter(e -> !relevantDocs.contains(e.getDocId()))
-                    .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
 
-            System.out.println("dnr: " + dnr.toString());
-            
-            Map<String, Double> sumWtDNR = null;
-            
-            dnr.forEach( entry -> {
-                List<StringPosting> strPos = docCache.get(entry.getDocId());
-                
-                Map<String, Double> tmp = (Map<String, Double>) Optional.ofNullable(strPos)
-                .orElseGet(Collections::emptyList).stream()
-                .collect(Collectors.groupingBy(StringPosting::getTerm, summingDouble(StringPosting::getTermWeigth)));
-                
-                tmp.forEach(sumWtDNR::putIfAbsent);
+            AtomicInteger i = new AtomicInteger(-1);
+            modifiedVector = queryVector.entrySet().stream()
+                    .collect(toMap(Map.Entry::getKey, e -> {
+                        i.getAndIncrement();
+                        System.out.println(i.get());
+                        return ALPHA * e.getValue()
+                                + (BETA / dr.size()) * positiveFeedbackVector[i.get()]
+                                - (THETA / dnr.size()) * negativeFeedbackBector[i.get()];
+                    }));
 
-            } );
-            
-            if(sumWtDNR != null){
-                Map<String, Double> resultDNR = sumWtDNR.entrySet().stream()
-                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * THETA));
-            }
-            
-            
-            //query
-            Map<String, Double> resultQ = queryVector.entrySet().stream()
-                    .collect(toMap(Map.Entry::getKey, e -> e.getValue() * ALPHA));
-            
-            
-            /*resultQ.forEach( (k,v) -> {
-                double drWt = resultDR.get(k);
-                double
-            });*/
-            
         } // type = implicit
         else {
 
         }
-        return null;
+        return modifiedVector;
     }
 
 }

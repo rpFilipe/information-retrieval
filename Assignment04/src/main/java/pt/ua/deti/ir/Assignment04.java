@@ -9,21 +9,12 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
-import org.datavec.api.util.ClassPathResource;
-import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.deeplearning4j.text.sentenceiterator.BasicLineIterator;
-import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
-import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -34,7 +25,6 @@ import pt.ua.deti.ir.Structures.Document;
 import pt.ua.deti.ir.Structures.QueryResult;
 import pt.ua.deti.ir.Tokenizer.ComplexTokenizer;
 import pt.ua.deti.ir.Tokenizer.Tokenizer;
-import pt.ua.ir.deti.FeedBack.RocchioFeedBack;
 
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação

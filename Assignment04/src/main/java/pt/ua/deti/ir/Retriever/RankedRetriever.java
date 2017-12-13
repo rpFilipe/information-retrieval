@@ -117,7 +117,7 @@ public class RankedRetriever {
                     p.forEach((posting) -> {
                         double dweight = posting.getTermWeigth();
                         double qweight = entry.getValue();
-                        scores[posting.getDocId() - 1] += qweight * dweight;
+                        scoreWfeedback[posting.getDocId() - 1] += qweight * dweight;
                     });
                 }
             });

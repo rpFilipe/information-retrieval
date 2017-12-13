@@ -106,8 +106,8 @@ public class Assignment04 {
 
             while (in.hasNextLine()) {
                 String line = in.nextLine();
-                qresult = rr.search(line, "explicit", true);
-                saveinFile(outFname, qresult, firstline);
+                qresult = rr.search(line, args[2], true);
+                saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
                 break;
             }
@@ -153,7 +153,7 @@ public class Assignment04 {
 
     }
 
-    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline) {
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline, String type) {
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
@@ -161,7 +161,8 @@ public class Assignment04 {
 
             String print;
             if (firstline) {
-                print = "query_id\tdoc_id\t\tdoc_score_\n";
+                print = "rocchio feedback relevance "+type+"\n";
+                print += "query_id\tdoc_id\t\tdoc_score_\n";
                 output.write(print);
                 output.flush();
             }

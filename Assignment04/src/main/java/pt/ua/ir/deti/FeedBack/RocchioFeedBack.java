@@ -173,7 +173,39 @@ public class RocchioFeedBack {
 
         } // type = implicit
         else {
+            
+            dr = retrieveDocs.stream()
+                    .map(doc -> doc.getDocId())
+                    .collect(Collectors.toSet());
 
+            TreeSet<StringPosting> postings;
+            StringPosting sp, tmp;
+            // iterating over all terms in query
+            for (String term : queryTerms) {
+                System.out.println(term);
+                int i = 0;
+                for (int docId : dr) {
+                    postings = docCache.get(docId);
+                    tmp = new StringPosting(term);
+                    if (postings.contains(tmp)) {
+                        sp = postings.headSet(tmp, true).first();
+                        positiveFeedbackVector[i] += sp.getTermWeigth();
+                    }
+                }
+
+                i++;
+            }
+
+            //THETA is zero
+            AtomicInteger i = new AtomicInteger(-1);
+            modifiedVector = queryVector.entrySet().stream()
+                    .collect(toMap(Map.Entry::getKey, e -> {
+                        i.getAndIncrement();
+                        System.out.println(i.get());
+                        return ALPHA * e.getValue()
+                                + (BETA / dr.size()) * positiveFeedbackVector[i.get()];
+                    }));
+            
         }
         return modifiedVector;
     }

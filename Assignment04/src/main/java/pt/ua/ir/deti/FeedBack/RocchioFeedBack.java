@@ -105,6 +105,10 @@ public class RocchioFeedBack {
 
     public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retrieveDocs) {
 
+        //debug
+        //System.out.println("QueryVector: "+queryVector);
+        //System.out.println("QueryVector Size: "+queryVector.size());
+        
         // relevant docs
         Map<String, Double> modifiedVector = null;
         Set<Integer> dr;
@@ -139,7 +143,7 @@ public class RocchioFeedBack {
             StringPosting sp, tmp;
             // iterating over all terms in query
             for (String term : queryTerms) {
-                System.out.println(term);
+                //System.out.println(term);
                 int i = 0;
                 for (int docId : dr) {
                     postings = docCache.get(docId);
@@ -165,7 +169,7 @@ public class RocchioFeedBack {
             modifiedVector = queryVector.entrySet().stream()
                     .collect(toMap(Map.Entry::getKey, e -> {
                         i.getAndIncrement();
-                        System.out.println(i.get());
+                        //System.out.println(i.get());
                         return ALPHA * e.getValue()
                                 + (BETA / dr.size()) * positiveFeedbackVector[i.get()]
                                 - (THETA / dnr.size()) * negativeFeedbackBector[i.get()];
@@ -182,7 +186,7 @@ public class RocchioFeedBack {
             StringPosting sp, tmp;
             // iterating over all terms in query
             for (String term : queryTerms) {
-                System.out.println(term);
+                //System.out.println(term);
                 int i = 0;
                 for (int docId : dr) {
                     postings = docCache.get(docId);
@@ -201,7 +205,7 @@ public class RocchioFeedBack {
             modifiedVector = queryVector.entrySet().stream()
                     .collect(toMap(Map.Entry::getKey, e -> {
                         i.getAndIncrement();
-                        System.out.println(i.get());
+                        //System.out.println(i.get());
                         return ALPHA * e.getValue()
                                 + (BETA / dr.size()) * positiveFeedbackVector[i.get()];
                     }));

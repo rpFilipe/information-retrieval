@@ -79,7 +79,7 @@ public class RankedRetriever {
         //TODO rocchio feedback
         Map<String, Double> queryVector = res;
 
-        System.out.println("res: " + res.toString());
+        //System.out.println("res: " + res.toString());
 
         res.entrySet().forEach(entry -> {
 
@@ -106,14 +106,18 @@ public class RankedRetriever {
         }
 
         if (feedback) {
+            queryResults = queryResults.stream()
+                .limit(10)
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+            
             queryVector = rfb.computeFeedBack(type, queryId, queryVector, queryResults);
-
+            //System.out.println("Size after feedback: "+ queryVector.size());
+            
             queryVector.entrySet().forEach(entry -> {
 
                 List<Posting> p;
 
                 if ((p = idx.getList(entry.getKey())) != null) {
-                    System.out.println("p: " + p.toString());
                     p.forEach((posting) -> {
                         double dweight = posting.getTermWeigth();
                         double qweight = entry.getValue();
@@ -179,7 +183,7 @@ public class RankedRetriever {
 
         for (String term : query) {
             lst = new ArrayList(vec.wordsNearest("light", nSimilar));
-            System.out.println(lst);
+            //System.out.println(lst);
             expandedQuery.addAll(lst);
         }
 

@@ -109,7 +109,6 @@ public class Assignment04 {
                 qresult = rr.search(line, args[2], true);
                 saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
-                break;
             }
             in.close();
             Timestamp end = new Timestamp(System.currentTimeMillis());

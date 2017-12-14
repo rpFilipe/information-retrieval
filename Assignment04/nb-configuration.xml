@@ -10,6 +10,7 @@ Without this configuration present, some functionality in the IDE may be limited
         <configurations>
             <configuration id="index" profiles=""/>
             <configuration id="query_expansion" profiles=""/>
+            <configuration id="query_expansion_explicit" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>

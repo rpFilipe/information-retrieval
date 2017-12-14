@@ -44,25 +44,37 @@ public class RankedRetriever {
         this.idx = idx;
         this.rfb = new RocchioFeedBack("docCache.idx", "cranfield.query.relevance.txt", 1.0, 1.0, 0.25, idx.getCorpusSize());
         this.tk = idx.getTk();
-        trainModel(sentences);
+        //trainModel(sentences);
         queryId = 0;
         nSimilar = 3;
     }
 
-    public TreeSet<QueryResult> search(String query, String type, boolean feedback) {
+    public TreeSet<QueryResult> search(String query, String type, boolean feedback, boolean wordExpansion) {
 
         double[] scores = new double[idx.getCorpusSize()];
         double[] scoreWfeedback = new double[idx.getCorpusSize()];
         queryId++;
-        List<String> lquery = tk.contentProcessor(query);
 
-        List<String> raw_query = Arrays.asList(query.split(" "));
-        raw_query = expandQuery(raw_query);
+        List<String> lquery;
 
-        query = "";
-        for (String s : raw_query) {
-            query = query + " " + s;
+        if (wordExpansion) {
+            List<String> raw_query = Arrays.asList(query.split(" "));
+            raw_query = expandQuery(raw_query);
+
+            System.out.println("*****");
+            System.out.println("query: " + query);
+            System.out.println("extended query: " + raw_query);
+            System.out.println("*****");
+
+            query = "";
+            for (String s : raw_query) {
+                query = query + " " + s;
+            }
         }
+
+        lquery = tk.contentProcessor(query);
+        
+        System.out.println("Size before feedback: "+ lquery.size());
 
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -78,8 +90,6 @@ public class RankedRetriever {
 
         //TODO rocchio feedback
         Map<String, Double> queryVector = res;
-
-        //System.out.println("res: " + res.toString());
 
         res.entrySet().forEach(entry -> {
 
@@ -107,12 +117,13 @@ public class RankedRetriever {
 
         if (feedback) {
             queryResults = queryResults.stream()
-                .limit(10)
-                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
-            
+                    .limit(10)
+                    .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+
+            System.out.println(type);
             queryVector = rfb.computeFeedBack(type, queryId, queryVector, queryResults);
-            //System.out.println("Size after feedback: "+ queryVector.size());
-            
+            System.out.println("Size after feedback: "+ queryVector.size());
+
             queryVector.entrySet().forEach(entry -> {
 
                 List<Posting> p;
@@ -182,7 +193,7 @@ public class RankedRetriever {
         List<String> lst;
 
         for (String term : query) {
-            lst = new ArrayList(vec.wordsNearest("light", nSimilar));
+            lst = new ArrayList(vec.wordsNearest(term, nSimilar));
             //System.out.println(lst);
             expandedQuery.addAll(lst);
         }

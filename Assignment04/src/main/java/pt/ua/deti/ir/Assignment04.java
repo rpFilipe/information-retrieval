@@ -106,9 +106,10 @@ public class Assignment04 {
 
             while (in.hasNextLine()) {
                 String line = in.nextLine();
-                qresult = rr.search(line, args[2], true);
+                qresult = rr.search(line, args[2], true, false);
                 saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
+                break;
             }
             in.close();
             Timestamp end = new Timestamp(System.currentTimeMillis());

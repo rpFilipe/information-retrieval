@@ -105,8 +105,6 @@ public class RocchioFeedBack {
         Map<String, Double> modifiedQueryVector = new HashMap<>();
         Set<Integer> dr;
         Set<Integer> dnr;
-        System.out.println(queryVector);
-        int queryTermsSize = queryVector.size();
         Map<String, Double> positiveFeedbackVector = new HashMap<>();
         Map<String, Double> negativeFeedbackVector = new HashMap<>();
         

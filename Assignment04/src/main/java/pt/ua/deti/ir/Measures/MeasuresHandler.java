@@ -21,6 +21,7 @@ public class MeasuresHandler {
     private double meanAveragePrecision;
     private double meanPrecisionAtRank10;
     private double meanReciprocalRank;
+    private double meanNDGC;
     
     public MeasuresHandler(String fname) throws FileNotFoundException {
         m = new Measures(fname);
@@ -31,6 +32,7 @@ public class MeasuresHandler {
         meanAveragePrecision = 0;
         meanPrecisionAtRank10 = 0;
         meanReciprocalRank = 0;
+        meanNDGC = 0;
     }
     
     public void computeQueryMeasures(TreeSet<QueryResult> qresult) {
@@ -50,6 +52,7 @@ public class MeasuresHandler {
         meanAveragePrecision += avgprecision;
         meanPrecisionAtRank10 += precisionAtRank;
         meanReciprocalRank += reciprocalRank;
+        meanNDGC += ndgc;
         
     }
     
@@ -61,5 +64,6 @@ public class MeasuresHandler {
         System.out.println("Precision at rank 10: " + meanPrecisionAtRank10 /nqueries);
         System.out.println("Mean Average Precision: " + meanAveragePrecision/nqueries);
         System.out.println("Mean Reciprocal Rank: " + meanReciprocalRank/nqueries);
+        System.out.println("Mean nDGC across all queries: " + meanNDGC/nqueries);
     }
 }

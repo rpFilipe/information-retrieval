@@ -3,7 +3,9 @@ package pt.ua.deti.ir.Measures;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import pt.ua.deti.ir.Structures.QueryResult;
+import pt.ua.deti.ir.Structures.Relevance;
 
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação
@@ -22,18 +25,24 @@ public class Measures {
     
     //private HashMap<Integer, LinkedList<Posting>> relevanceMap;
     private HashMap<Integer, LinkedList<Integer>> relevanceMap;
+    private HashMap<Integer, LinkedList<Relevance>> map_rel;
+    private static int i;
     
     public Measures(String fname) throws FileNotFoundException {
         
         File fileidx = new File(fname);
         Scanner fsc = new Scanner(fileidx);
         this.relevanceMap = new HashMap<>();
+        this.map_rel = new HashMap<>();
         
         String[] line;
         int currentQueryId = 1;
         int queryId, docId, relevance;
         //LinkedList<Posting> postings = new LinkedList();
-        LinkedList<Integer> docs = new LinkedList();
+        LinkedList<Integer> docs1 = new LinkedList();
+        LinkedList<Relevance> docs2 = new LinkedList();
+        Relevance rl;
+        i = 1;
         //Posting p;
         
         while(fsc.hasNext()) {
@@ -41,24 +50,30 @@ public class Measures {
             
             queryId = Integer.parseInt(line[0]);
             docId = Integer.parseInt(line[1]);
-            //relevance = Integer.parseInt(line[2]);
+            relevance = Integer.parseInt(line[2]);
 
             //p = new Posting(docId, relevance);
             //postings.add(p);
+            rl = new Relevance(queryId, docId, relevance);
+            
             if (currentQueryId != queryId){
-                relevanceMap.put(currentQueryId, docs);
+                relevanceMap.put(currentQueryId, docs1);
+                map_rel.put(currentQueryId, docs2);
                 //postings.clear();
-                docs = new LinkedList<>();
-                docs.add(docId);
+                docs1 = new LinkedList<>();
+                docs2 = new LinkedList<>();
+                docs1.add(docId);
+                docs2.add(rl);
                 currentQueryId = queryId;
             }
             else{
-                docs.add(docId);
+                docs1.add(docId);
+                docs2.add(rl);
             }
         } 
         
-        relevanceMap.put(currentQueryId, docs);
-        
+        relevanceMap.put(currentQueryId, docs1);
+        map_rel.put(currentQueryId, docs2);
         //showMap();
     }
     
@@ -156,25 +171,66 @@ public class Measures {
     
     public double nDCG(TreeSet<QueryResult> qresult){
         
-        LinkedList<Integer> docs = relevanceMap.get(qresult.first().getQueryId());
-        
+        LinkedList<Relevance> docsRelevantes = map_rel.get(qresult.first().getQueryId());       
         //System.out.println("Gold Standard: " + docs);
         
-        if(docs == null)
+        if(docsRelevantes == null)
             return 0.0;
         
-
+        // Helper to get the relevant docIDs to the query
+        List<Integer> relDocsId = docsRelevantes.stream()
+                .map(doc -> doc.getDocId())
+                .collect(Collectors.toList());
         
-        /* // retirar apenas os docs que aparecem com relevancia maior do que 1, portanto os que estao no gold standard
-        qresult.stream()
-                .filter(e -> docs.contains(e.getDocId()))
+        // retirar apenas os docs que aparecem com relevancia maior do que 0, portanto os que estao no gold standard
+        TreeSet<QueryResult> tmp = qresult.stream()
+                .filter(e -> relDocsId.contains(e.getDocId()))
                 .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
-        */
+   
+        System.out.println("docsRelevantes size: "+ docsRelevantes.size());
+        System.out.println("tmp size: "+ tmp.size());
+        System.out.println("tmp: "+ tmp);
         
-        //System.out.println("qresult size: "+ qresult.size());
-        //System.out.println("qresult: "+ qresult);
+        Map<Integer, Double> dcg = new HashMap<>(); 
+        Map<Integer, Integer> tmpIdcg = new HashMap<>();
+        // calcular dcg e colocar num mapa para depois ordenar e calcular idcg
+        for (QueryResult q : tmp) {
+            docsRelevantes.forEach((rl) -> {
+                if(q.getDocId() == rl.getDocId()){
+                    double dcgDoc = rl.getRelevance() / (Math.log(i+1) / Math.log(2)); //log base 2
+                    dcg.put(q.getDocId(), dcgDoc);
+                    i++;
+                }
+                tmpIdcg.put(rl.getDocId(), rl.getRelevance());
+            });
+        }
         
-        return 0.0;
+        // somar os dcg de todos os documentos
+        double dcgSum = dcg.values().stream().mapToDouble(Number::doubleValue).sum();
+        
+        System.out.println(dcg);
+        System.out.println(dcgSum);
+        System.out.println("tmpIdcg: "+tmpIdcg);
+        
+        //ordenar para calcular idcg
+        Map<Integer, Integer> relDocs = tmpIdcg.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,  
+                                (e1, e2) -> e1, LinkedHashMap::new));
+                
+        //System.out.println(relDocs);
+        
+        i = 1;
+        Map<Integer, Double> idcg = relDocs.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, key -> key.getValue() / (Math.log((i++)+1) / Math.log(2))));
+        
+        double idcgSum = dcg.values().stream().mapToDouble(Number::doubleValue).sum();
+        System.out.println(idcg);
+        System.out.println(i);
+        System.out.println(idcgSum);
+        
+
+        return dcgSum/idcgSum;
     }
     
     private void showMap(){

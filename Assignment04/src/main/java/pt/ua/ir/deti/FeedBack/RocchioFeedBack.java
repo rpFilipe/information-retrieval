@@ -101,15 +101,17 @@ public class RocchioFeedBack {
     }
 
     public Map<String, Double> computeFeedBack(String type, int queryId, Map<String, Double> queryVector, TreeSet<QueryResult> retrieveDocs) {
-        Map<String, Double> tmp = queryVector;
-        Map<String, Double> modifiedQueryVector = tmp;
+
+        Map<String, Double> modifiedQueryVector = new HashMap<>();
         Set<Integer> dr;
         Set<Integer> dnr;
-        Set<String> queryTerms = queryVector.keySet();
-        System.out.println(queryTerms);
-        int queryTermsSize = queryTerms.size();
+        System.out.println(queryVector);
+        int queryTermsSize = queryVector.size();
         Map<String, Double> positiveFeedbackVector = new HashMap<>();
         Map<String, Double> negativeFeedbackVector = new HashMap<>();
+        
+        modifiedQueryVector.putAll(queryVector);
+        //System.out.println("modified: "+modifiedQueryVector);
 
         if (type.equalsIgnoreCase("explicit")) {
 
@@ -213,18 +215,25 @@ public class RocchioFeedBack {
 
         }
         
-        Map <String, Double> modifiedQueryVectorRet = new HashMap<>();     
+        Map <String, Double> modifiedQueryVectorRet = new HashMap<>(), tmp = new HashMap<>();     
         
-        modifiedQueryVectorRet = modifiedQueryVector.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // ordenar para obter os 4 primeiros com maior peso
-               .filter((k) -> !queryTerms.contains(k.getKey()))  //TODO filtrar para obter os documentos que nao estao na query original 
+        // retirar apenas os 4 termos com maior peso e que nao estao na query
+        tmp = modifiedQueryVector.entrySet().stream()
+               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+               .filter((k) -> !queryVector.containsKey(k.getKey()))
                .limit(4) // apenas os 4 com maior peso
                .collect(Collectors.toMap(Entry::getKey, Entry::getValue,  // colocar num mapa
                                 (e1, e2) -> e1, LinkedHashMap::new));
 
-        System.out.println("modifiedQuery after: "+modifiedQueryVectorRet);
+        // retirar os que estao na query
+        modifiedQueryVectorRet = modifiedQueryVector.entrySet().stream()
+               .filter((k) -> queryVector.containsKey(k.getKey()))
+               .collect(Collectors.toMap(Entry::getKey, Entry::getValue,  
+                                (e1, e2) -> e1, LinkedHashMap::new));
         
-        // retirar os termos que estao na query e concatenar com os 4 termos com maior peso
+        // devolver os termos que estao na query + 4 de maior peso que nao estao na query
+        modifiedQueryVectorRet.putAll(tmp);
+       
         
         return modifiedQueryVectorRet;
     }

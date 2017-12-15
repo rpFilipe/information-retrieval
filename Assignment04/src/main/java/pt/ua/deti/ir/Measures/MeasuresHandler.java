@@ -41,6 +41,8 @@ public class MeasuresHandler {
         double precisionAtRank = m.precisionAtRank(qresult, 10);
         double avgprecision = m.averagePrecision(qresult);
         double reciprocalRank = m.reciprocalRank(qresult);
+        // added
+        double ndgc = m.nDCG(qresult);
         
         meanPrecision += precision;
         meanRecall += recall;

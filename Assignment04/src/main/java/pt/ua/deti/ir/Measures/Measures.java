@@ -154,6 +154,29 @@ public class Measures {
         return (values.stream().map((d) -> d).reduce(sum, (accumulator, _item) -> accumulator + _item))/values.size();
     }
     
+    public double nDCG(TreeSet<QueryResult> qresult){
+        
+        LinkedList<Integer> docs = relevanceMap.get(qresult.first().getQueryId());
+        
+        //System.out.println("Gold Standard: " + docs);
+        
+        if(docs == null)
+            return 0.0;
+        
+
+        
+        /* // retirar apenas os docs que aparecem com relevancia maior do que 1, portanto os que estao no gold standard
+        qresult.stream()
+                .filter(e -> docs.contains(e.getDocId()))
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+        */
+        
+        //System.out.println("qresult size: "+ qresult.size());
+        //System.out.println("qresult: "+ qresult);
+        
+        return 0.0;
+    }
+    
     private void showMap(){
         
         for (Map.Entry<Integer, LinkedList<Integer>> entry : relevanceMap.entrySet()) {

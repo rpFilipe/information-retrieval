@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import pt.ua.deti.ir.CorpusReder.CorpusReader;
 import pt.ua.deti.ir.Indexer.Indexer;
+import pt.ua.deti.ir.Measures.MeasuresHandler;
 import pt.ua.deti.ir.Retriever.RankedRetriever;
 import pt.ua.deti.ir.Structures.Document;
 import pt.ua.deti.ir.Structures.QueryResult;
@@ -91,6 +92,7 @@ public class Assignment04 {
         } else if (args[0].equalsIgnoreCase("query_expansion")) {
 
             Indexer idx = new Indexer(args[1]);
+            MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
             RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
             TreeSet<QueryResult> qresult;
             File fqueries = new File("cranfield.queries.txt");
@@ -107,11 +109,15 @@ public class Assignment04 {
             while (in.hasNextLine()) {
                 String line = in.nextLine();
                 qresult = rr.search(line, args[2], true, false);
+                mh.computeQueryMeasures(qresult);
                 saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
                 break;
             }
+            
+            mh.computeRetrieverMeasures();
             in.close();
+            
             Timestamp end = new Timestamp(System.currentTimeMillis());
             double delta = end.getTime() - begin.getTime();
 

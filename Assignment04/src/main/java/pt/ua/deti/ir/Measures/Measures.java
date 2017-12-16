@@ -172,11 +172,11 @@ public class Measures {
     public double nDCG(TreeSet<QueryResult> qresult){
         i = 1;
         LinkedList<Relevance> docsRelevantes = map_rel.get(qresult.first().getQueryId());       
-        //System.out.println("Gold Standard: " + docs);
+        //System.out.println("Gold Standard: " + docsRelevantes);
         
         if(docsRelevantes == null)
             return 0.0;
-        
+        /*
         // Helper to get the relevant docIDs to the query
         List<Integer> relDocsId = docsRelevantes.stream()
                 .map(doc -> doc.getDocId())
@@ -194,22 +194,26 @@ public class Measures {
                 
         // para o caso em que nao devolvemos nenhum doc, o retorno e zero
         // nao precisamos calcular o idcg porque o ndcg vai ser zero
-        if(tmp.isEmpty())
+        */
+        //if(tmp.isEmpty())
+        if(qresult.isEmpty())
             return 0.0;
         
         Map<Integer, Double> dcg = new HashMap<>(); 
         Map<Integer, Integer> tmpIdcg = new HashMap<>();
         
         // calcular dcg e colocar num mapa para depois ordenar e calcular idcg
-        for (QueryResult q : tmp) {
+        for (QueryResult q : qresult) {
+        //for (QueryResult q : tmp) {
             docsRelevantes.forEach((rl) -> {
                 if(q.getDocId() == rl.getDocId()){
                     double dcgDoc = rl.getRelevance() / (Math.log(i+1) / Math.log(2)); //log base 2
                     dcg.put(q.getDocId(), dcgDoc);
-                    i++;
+                    //i++;
                 }
                 tmpIdcg.putIfAbsent(rl.getDocId(), rl.getRelevance());
             });
+            i++; //TODO: DUVIDA perguntar ao prof
         }
         
         // somar os dcg de todos os documentos

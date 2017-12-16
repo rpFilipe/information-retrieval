@@ -90,7 +90,8 @@ public class Assignment04 {
             }
 
         } else if (args[0].equalsIgnoreCase("query_expansion")) {
-
+            System.out.println(args[2]);
+            
             Indexer idx = new Indexer(args[1]);
             MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
             RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");

@@ -120,9 +120,8 @@ public class RankedRetriever {
                     .limit(10)
                     .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
 
-            System.out.println(type);
             queryVector = rfb.computeFeedBack(type, queryId, queryVector, queryResults);
-            System.out.println("Size after feedback: "+ queryVector.size());
+            //System.out.println("Size after feedback: "+ queryVector.size());
 
             queryVector.entrySet().forEach(entry -> {
 

@@ -53,7 +53,7 @@ public class MeasuresHandler {
         meanPrecisionAtRank10 += precisionAtRank;
         meanReciprocalRank += reciprocalRank;
         meanNDGC += ndgc;
-        System.out.println("meanNDGC: "+meanNDGC);
+        //System.out.println("meanNDGC: "+meanNDGC);
         
     }
     

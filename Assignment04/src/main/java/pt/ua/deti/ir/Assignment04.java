@@ -112,7 +112,7 @@ public class Assignment04 {
                 mh.computeQueryMeasures(qresult);
                 saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
-                break;
+                //break;
             }
             
             mh.computeRetrieverMeasures();

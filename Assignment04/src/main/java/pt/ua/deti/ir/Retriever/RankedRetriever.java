@@ -74,7 +74,7 @@ public class RankedRetriever {
 
         lquery = tk.contentProcessor(query);
         
-        System.out.println("Size before feedback: "+ lquery.size());
+        //System.out.println("Size before feedback: "+ lquery.size());
 
         Map<String, Long> queryTokens = (Map<String, Long>) lquery.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));

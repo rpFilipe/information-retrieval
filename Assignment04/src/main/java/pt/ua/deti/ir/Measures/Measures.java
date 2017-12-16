@@ -170,7 +170,7 @@ public class Measures {
     }
     
     public double nDCG(TreeSet<QueryResult> qresult){
-        
+        i = 1;
         LinkedList<Relevance> docsRelevantes = map_rel.get(qresult.first().getQueryId());       
         //System.out.println("Gold Standard: " + docs);
         
@@ -183,16 +183,23 @@ public class Measures {
                 .collect(Collectors.toList());
         
         // retirar apenas os docs que aparecem com relevancia maior do que 0, portanto os que estao no gold standard
+        // para calcular o real dcg
         TreeSet<QueryResult> tmp = qresult.stream()
                 .filter(e -> relDocsId.contains(e.getDocId()))
                 .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
    
-        System.out.println("docsRelevantes size: "+ docsRelevantes.size());
-        System.out.println("tmp size: "+ tmp.size());
-        System.out.println("tmp: "+ tmp);
+        //System.out.println("docsRelevantes size: "+ docsRelevantes.size());
+        //System.out.println("tmp size: "+ tmp.size());
+        //System.out.println("tmp: "+ tmp);
+                
+        // para o caso em que nao devolvemos nenhum doc, o retorno e zero
+        // nao precisamos calcular o idcg porque o ndcg vai ser zero
+        if(tmp.isEmpty())
+            return 0.0;
         
         Map<Integer, Double> dcg = new HashMap<>(); 
         Map<Integer, Integer> tmpIdcg = new HashMap<>();
+        
         // calcular dcg e colocar num mapa para depois ordenar e calcular idcg
         for (QueryResult q : tmp) {
             docsRelevantes.forEach((rl) -> {
@@ -201,35 +208,28 @@ public class Measures {
                     dcg.put(q.getDocId(), dcgDoc);
                     i++;
                 }
-                tmpIdcg.put(rl.getDocId(), rl.getRelevance());
+                tmpIdcg.putIfAbsent(rl.getDocId(), rl.getRelevance());
             });
         }
         
         // somar os dcg de todos os documentos
         double dcgSum = dcg.values().stream().mapToDouble(Number::doubleValue).sum();
         
-        System.out.println(dcg);
-        System.out.println(dcgSum);
-        System.out.println("tmpIdcg: "+tmpIdcg);
-        
-        //ordenar para calcular idcg
-        Map<Integer, Integer> relDocs = tmpIdcg.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,  
-                                (e1, e2) -> e1, LinkedHashMap::new));
-                
-        //System.out.println(relDocs);
+        //System.out.println(dcg);
+        //System.out.println(dcgSum);
+        //System.out.println("tmpIdcg: "+tmpIdcg);
         
         i = 1;
-        Map<Integer, Double> idcg = relDocs.entrySet().stream()
+        //ordenar para calcular idcg
+        Map<Integer, Double> idcg  = tmpIdcg.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey, key -> key.getValue() / (Math.log((i++)+1) / Math.log(2))));
+                
+        //System.out.println(idcg);
         
-        double idcgSum = dcg.values().stream().mapToDouble(Number::doubleValue).sum();
-        System.out.println(idcg);
-        System.out.println(i);
-        System.out.println(idcgSum);
+        double idcgSum = idcg.values().stream().mapToDouble(Number::doubleValue).sum();
+        //System.out.println("idcgSum: "+idcgSum);
         
-
         return dcgSum/idcgSum;
     }
     

@@ -203,8 +203,10 @@ public class Measures {
         Map<Integer, Integer> tmpIdcg = new HashMap<>();
         
         // calcular dcg e colocar num mapa para depois ordenar e calcular idcg
-        for (QueryResult q : qresult) {
+        //for (QueryResult q : qresult) {
         //for (QueryResult q : tmp) {
+        
+        qresult.forEach(q -> { 
             docsRelevantes.forEach((rl) -> {
                 if(q.getDocId() == rl.getDocId()){
                     double dcgDoc = rl.getRelevance() / (Math.log(i+1) / Math.log(2)); //log base 2
@@ -214,7 +216,7 @@ public class Measures {
                 tmpIdcg.putIfAbsent(rl.getDocId(), rl.getRelevance());
             });
             i++; //TODO: DUVIDA perguntar ao prof
-        }
+        });
         
         // somar os dcg de todos os documentos
         double dcgSum = dcg.values().stream().mapToDouble(Number::doubleValue).sum();

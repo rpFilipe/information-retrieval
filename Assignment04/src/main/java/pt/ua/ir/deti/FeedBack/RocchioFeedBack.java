@@ -186,19 +186,17 @@ public class RocchioFeedBack {
         } // type = implicit
         else {
             
-            LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);
-            if (relevantDocs == null) {
-                return queryVector;
-            }
-            // Helper to get the relevant docIDs to the query
-            List<Integer> relDocsId = relevantDocs.stream()
-                    .map(doc -> doc.getDocId())
-                    .collect(Collectors.toList());
+            TreeSet<StringPosting> postings;
+            
+            // Adding all document vector terms
+            for (QueryResult q : retrieveDocs) {
+                postings = docCache.get(q.getDocId());
 
-            dr = retrieveDocs.stream()
-                    .filter(doc -> relDocsId.contains(doc.getDocId()))
-                    .map(doc -> doc.getDocId())
-                    .collect(Collectors.toSet());
+                postings.forEach((p) -> {
+                    positiveFeedbackVector.putIfAbsent(p.getTerm(), p.getTermWeigth());
+                    positiveFeedbackVector.computeIfPresent(p.getTerm(), (k, v) -> v + p.getTermWeigth());
+                });
+            }
             
             /*
             iterating over the positiveFeedbackVector and checking the values in the modifiedQueryVector

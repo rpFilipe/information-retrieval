@@ -3,7 +3,6 @@ package pt.ua.deti.ir.Retriever;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import pt.ua.deti.ir.Indexer.Indexer;
 import pt.ua.deti.ir.Structures.Posting;
@@ -23,7 +22,7 @@ import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-import pt.ua.ir.deti.FeedBack.RocchioFeedBack;
+import pt.ua.deti.ir.FeedBack.RocchioFeedBack;
 
 /**
  * Universidade de Aveiro, DETI, Recuperação de Informação

@@ -1,4 +1,4 @@
-package pt.ua.ir.deti.FeedBack;
+package pt.ua.deti.ir.FeedBack;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -167,7 +167,7 @@ public class RocchioFeedBack {
              */
             positiveFeedbackVector.forEach((t, u) -> {
                 modifiedQueryVector.putIfAbsent(t, u * BETA);
-                modifiedQueryVector.computeIfPresent(t, (k, v) -> v + u * BETA);
+                modifiedQueryVector.computeIfPresent(t, (k, v) -> v + (u * BETA));
             });
 
             /*
@@ -177,7 +177,7 @@ public class RocchioFeedBack {
              */
             negativeFeedbackVector.forEach((t, u) -> {
                 modifiedQueryVector.putIfAbsent(t, u * THETA);
-                modifiedQueryVector.computeIfPresent(t, (k, v) -> v + u * THETA);
+                modifiedQueryVector.computeIfPresent(t, (k, v) -> v + (u * THETA));
             });
             
 //            System.out.println("modifiedQueryVector");

@@ -107,7 +107,7 @@ public class RocchioFeedBack {
         Set<Integer> dnr;
         Map<String, Double> positiveFeedbackVector = new HashMap<>();
         Map<String, Double> negativeFeedbackVector = new HashMap<>();
-        
+
         modifiedQueryVector.putAll(queryVector);
         //System.out.println("modified: "+modifiedQueryVector);
 
@@ -133,14 +133,18 @@ public class RocchioFeedBack {
                     .collect(Collectors.toSet());
 
             TreeSet<StringPosting> postings;
+            LinkedList<Relevance> queryRelevances;
 
             // Adding all document vector terms
+            int idx;
             for (int docId : dr) {
                 postings = docCache.get(docId);
-
+                queryRelevances = relevanceMap.get(queryId);
+                idx = queryRelevances.indexOf(new Relevance(queryId, docId));
+                final int rel = queryRelevances.get(idx).getRelevance();
                 postings.forEach((p) -> {
                     positiveFeedbackVector.putIfAbsent(p.getTerm(), p.getTermWeigth());
-                    positiveFeedbackVector.computeIfPresent(p.getTerm(), (k, v) -> v + p.getTermWeigth());
+                    positiveFeedbackVector.computeIfPresent(p.getTerm(), (k, v) -> v + (1 / rel) * p.getTermWeigth());
                 });
             }
 
@@ -150,10 +154,8 @@ public class RocchioFeedBack {
 //            System.out.println("positiveFeedbackVector");
 //            System.out.println("positiveFeedbackVector size: " + positiveFeedbackVector.size());
 //            print(positiveFeedbackVector);
-
             for (int docId : dnr) {
                 postings = docCache.get(docId);
-
                 postings.forEach((p) -> {
                     negativeFeedbackVector.putIfAbsent(p.getTerm(), p.getTermWeigth());  // retirei o -
                     negativeFeedbackVector.computeIfPresent(p.getTerm(), (k, v) -> v - p.getTermWeigth());
@@ -179,15 +181,12 @@ public class RocchioFeedBack {
                 modifiedQueryVector.putIfAbsent(t, u * THETA);
                 modifiedQueryVector.computeIfPresent(t, (k, v) -> v + (u * THETA));
             });
-            
-//            System.out.println("modifiedQueryVector");
-//            print(modifiedQueryVector);
 
         } // type = implicit
         else {
-            
+
             TreeSet<StringPosting> postings;
-            
+
             // Adding all document vector terms
             for (QueryResult q : retrieveDocs) {
                 postings = docCache.get(q.getDocId());
@@ -197,7 +196,7 @@ public class RocchioFeedBack {
                     positiveFeedbackVector.computeIfPresent(p.getTerm(), (k, v) -> v + p.getTermWeigth());
                 });
             }
-            
+
             /*
             iterating over the positiveFeedbackVector and checking the values in the modifiedQueryVector
             if they dont exist just add them to the modifiedQueryVector
@@ -208,29 +207,36 @@ public class RocchioFeedBack {
                 modifiedQueryVector.computeIfPresent(t, (k, v) -> v + u * BETA);
             });
 
-
         }
-        
-        Map <String, Double> modifiedQueryVectorRet = new HashMap<>(), tmp = new HashMap<>();     
-        
+
+        Map<String, Double> modifiedQueryVectorRet = new HashMap<>(), tmp = new HashMap<>();
+
         // retirar apenas os 4 termos com maior peso e que nao estao na query
         tmp = modifiedQueryVector.entrySet().stream()
-               .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-               .filter((k) -> !queryVector.containsKey(k.getKey()))
-               .limit(4) // apenas os 4 com maior peso
-               .collect(Collectors.toMap(Entry::getKey, Entry::getValue,  // colocar num mapa
-                                (e1, e2) -> e1, LinkedHashMap::new));
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .filter((k) -> !queryVector.containsKey(k.getKey()))
+                .limit(4) // apenas os 4 com maior peso
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, // colocar num mapa
+                        (e1, e2) -> e1, LinkedHashMap::new));
 
         // retirar os que estao na query
         modifiedQueryVectorRet = modifiedQueryVector.entrySet().stream()
-               .filter((k) -> queryVector.containsKey(k.getKey()))
-               .collect(Collectors.toMap(Entry::getKey, Entry::getValue,  
-                                (e1, e2) -> e1, LinkedHashMap::new));
-        
+                .filter((k) -> queryVector.containsKey(k.getKey()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue,
+                        (e1, e2) -> e1, LinkedHashMap::new));
+
         // devolver os termos que estao na query + 4 de maior peso que nao estao na query
         modifiedQueryVectorRet.putAll(tmp);
-       
-        
+
+//        System.out.println("original");
+//        print(queryVector);
+//
+//        System.out.println("modifiedQueryVector");
+//        print(modifiedQueryVectorRet);
+//
+//        System.out.println("modifiedQueryVector");
+//        print(modifiedQueryVector);
+
         return modifiedQueryVectorRet;
     }
 

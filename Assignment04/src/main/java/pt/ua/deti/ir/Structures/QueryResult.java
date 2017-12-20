@@ -34,7 +34,9 @@ public class QueryResult implements Comparable{
 
     @Override
     public String toString() {
-        return "" + this.queryId + "\t\t" + this.docId + "\t\t" + this.score;
+        String s = String.format("%8d | %6d | %18.16f", this.queryId, this.docId, this.score);
+        return s;
+        //return "" + this.queryId + "\t\t" + this.docId + "\t\t" + this.score;
     }
 
     @Override

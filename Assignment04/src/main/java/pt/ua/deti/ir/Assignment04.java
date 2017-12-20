@@ -113,7 +113,8 @@ public class Assignment04 {
                 mh.computeQueryMeasures(qresult);
                 saveinFile(outFname, qresult, firstline, args[2]);
                 firstline = false;
-                //break;
+                queriesPrecessed++;
+                break;
             }
             
             mh.computeRetrieverMeasures();
@@ -121,7 +122,7 @@ public class Assignment04 {
             
             Timestamp end = new Timestamp(System.currentTimeMillis());
             double delta = end.getTime() - begin.getTime();
-
+            System.out.println("Queries Processed: " + queriesPrecessed);
             System.out.println("Query Throughput: " + (1 / (delta / queriesPrecessed / 1000)) + " queries per second");
             System.out.println("Query Latency: " + (delta / queriesPrecessed) + " ms");
         }

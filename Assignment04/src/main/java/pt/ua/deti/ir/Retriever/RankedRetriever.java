@@ -162,6 +162,17 @@ public class RankedRetriever {
 
         return queryResults;
     }
+    
+        public TreeSet<QueryResult> search(String query, String type, boolean feedback, int limit) {
+        
+        TreeSet<QueryResult> result = search(query, type, feedback);
+        
+        result = result.stream()
+                .limit(limit)
+                .collect(Collectors.toCollection(TreeSet<QueryResult>::new));
+        
+        return result;
+    } 
 
     public void print(Map<String, Double> res) {
         res.entrySet().forEach(entry -> {

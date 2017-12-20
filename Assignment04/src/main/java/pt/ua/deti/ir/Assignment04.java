@@ -125,20 +125,20 @@ public class Assignment04 {
                 if(args[4].equalsIgnoreCase("true"))
                     qresult = rr.search(line, args[2], true);
                 else if(args[4].equalsIgnoreCase("false"))
-                    qresult = rr.search(line, args[2], false);
+                    qresult = rr.search(line, args[2], false, 30);
                 else{
                     usage();
                     System.exit(0);
                 }
                 
-                mh.computeQueryMeasures(qresult);
-                saveinFile(outFname, qresult, firstline, args[2], args[3]);
+                //mh.computeQueryMeasures(qresult);
+                //saveinFile(outFname, qresult, firstline, args[2], args[3]);
                 firstline = false;
                 queriesPrecessed++;
                 //break;
             }
             
-            mh.computeRetrieverMeasures();
+            //mh.computeRetrieverMeasures();
             in.close();
             
             Timestamp end = new Timestamp(System.currentTimeMillis());

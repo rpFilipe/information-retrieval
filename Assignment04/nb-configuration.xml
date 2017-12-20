@@ -9,8 +9,9 @@ Without this configuration present, some functionality in the IDE may be limited
     <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
         <configurations>
             <configuration id="index" profiles=""/>
-            <configuration id="query_expansion" profiles=""/>
-            <configuration id="query_expansion_explicit" profiles=""/>
+            <configuration id="search_feedback_explicit" profiles=""/>
+            <configuration id="search_feedback_implicit" profiles=""/>
+            <configuration id="search_query_expansion" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>

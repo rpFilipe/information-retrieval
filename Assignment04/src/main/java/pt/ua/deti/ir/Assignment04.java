@@ -89,13 +89,24 @@ public class Assignment04 {
                 java.util.logging.Logger.getLogger(Assignment04.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else if (args[0].equalsIgnoreCase("query_expansion")) {
+        } else if (args[0].equalsIgnoreCase("search")) {
             System.out.println(args[2]);
             
             Indexer idx = new Indexer(args[1]);
             MeasuresHandler mh = new MeasuresHandler("cranfield.query.relevance.txt");
-            RankedRetriever rr = new RankedRetriever(idx, "cranfield_sentences.txt");
-            TreeSet<QueryResult> qresult;
+            RankedRetriever rr = null;
+            
+            //query_expansion
+            if(args[3].equalsIgnoreCase("false"))
+                rr = new RankedRetriever(idx, false);
+            else if(args[3].equalsIgnoreCase("true"))
+                rr = new RankedRetriever(idx, "cranfield_sentences.txt", true);
+            else{
+                usage();
+                System.exit(0);
+            }
+            
+            TreeSet<QueryResult> qresult = null;
             File fqueries = new File("cranfield.queries.txt");
             Scanner in = new Scanner(fqueries);
 
@@ -109,12 +120,22 @@ public class Assignment04 {
 
             while (in.hasNextLine()) {
                 String line = in.nextLine();
-                qresult = rr.search(line, args[2], true, false);
+                
+                //rocchio feedback
+                if(args[4].equalsIgnoreCase("true"))
+                    qresult = rr.search(line, args[2], true);
+                else if(args[4].equalsIgnoreCase("false"))
+                    qresult = rr.search(line, args[2], false);
+                else{
+                    usage();
+                    System.exit(0);
+                }
+                
                 mh.computeQueryMeasures(qresult);
-                saveinFile(outFname, qresult, firstline, args[2]);
+                saveinFile(outFname, qresult, firstline, args[2], args[3]);
                 firstline = false;
                 queriesPrecessed++;
-                break;
+                //break;
             }
             
             mh.computeRetrieverMeasures();
@@ -132,9 +153,9 @@ public class Assignment04 {
     private static void usage() {
         System.out.println("Usage:\n"
                 + "index cranfield/ src/main/java/pt/ua/deti/ir/Stopwords/stopwords.txt english 3 index.idx complex\n"
-                + "or\nsearch index.idx cranfield.queries.txt <optional limit>\n"
-                + "or\nsearch2 index_complex.txt cranfield.queries.txt a <optional limit>\n"
-                + "or\nsearch2 index_complex.txt cranfield.queries.txt b <optional limit>");
+                + "or\nsearch index.idx explicit false true\n"
+                + "or\nsearch index.idx implicit false true\n"
+                + "or\nsearch index.idx <explicit or implicit> ture false");
     }
 
     private static void saveSentecesInFile(String fname, List<String> sentences) {
@@ -161,7 +182,7 @@ public class Assignment04 {
 
     }
 
-    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline, String type) {
+    private static void saveinFile(String fname, TreeSet<QueryResult> qresult, boolean firstline, String type, String whatToDo) {
         try {
             FileOutputStream outstream = new FileOutputStream(fname, true);
             Writer output = new OutputStreamWriter(outstream);
@@ -169,7 +190,10 @@ public class Assignment04 {
 
             String print;
             if (firstline) {
-                print = "rocchio feedback relevance "+type+"\n";
+                if(whatToDo.equalsIgnoreCase("true"))
+                    print = "query expansion\n";
+                else
+                    print = "rocchio feedback relevance "+type+"\n";
                 print += "query_id\tdoc_id\t\tdoc_score_\n";
                 output.write(print);
                 output.flush();

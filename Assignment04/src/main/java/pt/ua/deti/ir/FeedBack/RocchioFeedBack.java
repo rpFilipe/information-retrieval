@@ -110,7 +110,9 @@ public class RocchioFeedBack {
 
         modifiedQueryVector.putAll(queryVector);
         //System.out.println("modified: "+modifiedQueryVector);
-
+        modifiedQueryVector.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, key -> key.getValue() * ALPHA));
+        
         if (type.equalsIgnoreCase("explicit")) {
 
             LinkedList<Relevance> relevantDocs = relevanceMap.get(queryId);

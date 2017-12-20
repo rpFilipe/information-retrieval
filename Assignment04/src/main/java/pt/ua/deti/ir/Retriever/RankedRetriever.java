@@ -38,39 +38,52 @@ public class RankedRetriever {
     private Word2Vec vec;
     private static int queryId;
     private final int nSimilar;
+    private boolean wordExpansion;
 
-    public RankedRetriever(Indexer idx, String sentences) throws FileNotFoundException {
+    public RankedRetriever(Indexer idx, String sentences, boolean wordExpansion) throws FileNotFoundException {
         this.idx = idx;
         this.rfb = new RocchioFeedBack("docCache.idx", "cranfield.query.relevance.txt", 1.0, 1.0, 0.25, idx.getCorpusSize());
         this.tk = idx.getTk();
         //trainModel(sentences);
         queryId = 0;
         nSimilar = 3;
+        this.wordExpansion = wordExpansion;
+        if(wordExpansion)
+            trainModel(sentences);
+    }
+    
+    public RankedRetriever(Indexer idx, boolean wordExpansion) throws FileNotFoundException {
+        this.idx = idx;
+        this.rfb = new RocchioFeedBack("docCache.idx", "cranfield.query.relevance.txt", 1.0, 1.0, 0.25, idx.getCorpusSize());
+        this.tk = idx.getTk();
+        queryId = 0;
+        nSimilar = 3;
+        this.wordExpansion = wordExpansion;
     }
 
-    public TreeSet<QueryResult> search(String query, String type, boolean feedback, boolean wordExpansion) {
+    public TreeSet<QueryResult> search(String query, String type, boolean feedback) {
 
         double[] scores = new double[idx.getCorpusSize()];
         double[] scoreWfeedback = new double[idx.getCorpusSize()];
         queryId++;
-
-        List<String> lquery;
+        
 
         if (wordExpansion) {
             List<String> raw_query = Arrays.asList(query.split(" "));
             raw_query = expandQuery(raw_query);
-
+            /*
             System.out.println("*****");
             System.out.println("query: " + query);
             System.out.println("extended query: " + raw_query);
             System.out.println("*****");
-
+            */
             query = "";
             for (String s : raw_query) {
                 query = query + " " + s;
             }
         }
 
+        List<String> lquery;
         lquery = tk.contentProcessor(query);
         
         //System.out.println("Size before feedback: "+ lquery.size());
@@ -87,7 +100,7 @@ public class RankedRetriever {
         res = res.entrySet().stream()
                 .collect(toMap(Entry::getKey, e -> e.getValue() / qnorm));
 
-        //TODO rocchio feedback
+        //rocchio feedback
         Map<String, Double> queryVector = res;
 
         res.entrySet().forEach(entry -> {

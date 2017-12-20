@@ -228,7 +228,7 @@ public class Measures {
         i = 1;
         //ordenar para calcular idcg
         Map<Integer, Double> idcg  = tmpIdcg.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, key -> key.getValue() / (Math.log((i++)+1) / Math.log(2))));
                 
         //System.out.println(idcg);

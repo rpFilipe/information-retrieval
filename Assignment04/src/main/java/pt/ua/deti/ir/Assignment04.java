@@ -131,14 +131,14 @@ public class Assignment04 {
                     System.exit(0);
                 }
                 
-                //mh.computeQueryMeasures(qresult);
-                //saveinFile(outFname, qresult, firstline, args[2], args[3]);
+                mh.computeQueryMeasures(qresult);
+                saveinFile(outFname, qresult, firstline, args[2], args[3]);
                 firstline = false;
                 queriesPrecessed++;
                 //break;
             }
             
-            //mh.computeRetrieverMeasures();
+            mh.computeRetrieverMeasures();
             in.close();
             
             Timestamp end = new Timestamp(System.currentTimeMillis());
@@ -155,7 +155,8 @@ public class Assignment04 {
                 + "index cranfield/ src/main/java/pt/ua/deti/ir/Stopwords/stopwords.txt english 3 index.idx complex\n"
                 + "or\nsearch index.idx explicit false true\n"
                 + "or\nsearch index.idx implicit false true\n"
-                + "or\nsearch index.idx <explicit or implicit> ture false");
+                + "or\nsearch index.idx <explicit or implicit> ture false\n"
+                + "or\nsearch index.idx <explicit or implicit> false false");
     }
 
     private static void saveSentecesInFile(String fname, List<String> sentences) {

@@ -12,6 +12,7 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="search_feedback_explicit" profiles=""/>
             <configuration id="search_feedback_implicit" profiles=""/>
             <configuration id="search_query_expansion" profiles=""/>
+            <configuration id="search" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>
